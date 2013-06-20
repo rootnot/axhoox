@@ -6,8 +6,390 @@
     
     console.log('starting...');
     
-    var AX_QUERY = 'type=referenceDiagramObject';
+    // constants
+    
+    // object type that is a master reference
+    var MASTER_REF_TYPE = 'referenceDiagramObject';
+    
+    // object type that is a dynamic panel reference
+    var PANEL_REF_TYPE = 'dynamicPanel';
+    
+    // event names for hooks
     var EVENT_NAMES = ['click', 'mouseover', 'mouseout', 'change', 'keyup', 'focus', 'blur' ];
+    
+    // regexp for querying rdo##AAA type functions
+    var RDO_RX = /^rdo(\d+)(\D+)$/;
+    
+    
+    // runtime vars
+    
+    var _scriptIdToPath = {};
+    var _pathToContext = {};
+    var _rdoFnToPath = [];
+    
+    var _currentCallInfo;
+    
+    
+    // preserving calling information
+    
+    // prepare a restore function
+    function _makeRestoreFn(callInfo) {
+    	return function() {
+    		_currentCallInfo = callInfo;
+    	};
+    }
+    
+    // save calling information object
+    function _saveCallInfo(callInfo) {
+    	if (typeof (_currentCallInfo) !== 'undefined') {
+    		
+    		callInfo.restore = _makeRestoreFn(_currentCallInfo);
+    		_currentCallInfo = callInfo;
+    		
+    	}
+    }
+    
+    // restore calling information object
+    function _restoreCallInfo() {
+    	if (typeof (_currentCallInfo) !== 'undefined') {
+    		_currentCallInfo.restore();
+    	}
+    }
+
+	// wrap any function with an encelope preserving calling info object
+    function _wrap(fn, callInfo) {
+    	return (function() {
+    		_saveCallInfo(callInfo);
+    		fn.apply(this, arguments);
+    		_restoreCallInfo();
+    	})
+    }
+    
+    // wrap an rdo function
+    function _wrapRdoFn(rdoIdx, eventName) {
+    	var rdoName = 'rdo' + rdoIdx + eventName;
+    	var fn = window[rdoName];
+    	
+    	window[rdoName] = _wrap(window[rdoName], {
+    		eventName 	: eventName,
+    		path		: _rdoFnToPath[rdoIdx]
+    	});
+    }
+    
+    // wrap all handlers for provided eventName and scriptId
+    function _wrapObjectEventHandlers(scriptId, eventName) {
+    	var domCtx = document.getElementById(scriptId);
+    	var evInfo = $._data(domCtx, 'events');
+    	
+    	if (!evInfo || !evInfo[eventName] || !evInfo[eventName].length) {
+    		// no handlers, return
+    		return;
+    	}
+    	
+    	var $domCtx = $(domCtx);
+    	
+    	evInfo[eventName].forEach(function(ei) {
+    		var handler = ei.handler;
+    		var axCtx = $axure.pageData.scriptIdToObject[scriptId];
+    		$domCtx.off(eventName, handler);
+    		$domCtx.on(eventName, _wrap(handler, {
+	    		eventName 	: eventName,
+	    		path		: _scriptIdToPath[scriptId]
+    		})));
+    	});
+    	
+    }
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Context API
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// agnostics (low level)
+
+    // return context object for given path
+    function _getContext(path) {
+    	if (typeof(_pathToContext[path]) === 'string') {
+    		// lazy evauation on a path basis
+    		_pathToContext[path] = new Context(path, _pathToContext[path]);
+    	}
+    	
+    	return _pathToContext[path];
+    }
+    
+	function _fireRemoteEvent(path, eventName) {
+		
+		path = path || this.path;
+		
+		var rdoIdx = _rdoFnToPath.indexOf(path);
+		var fn = rdoIdx !== -1 && window['rdo' + rdoIdx + eventName];
+		
+		if (fn instanceOf function) {
+			fn();
+		}
+		
+		return this;
+		
+	}
+	
+	// methods
+	
+	function _fireEvent(eventName) {
+		_fireRemoteEvent(this.path, eventName);
+	}
+	
+	function _getNewContext(newPath) {
+		if (newpath.charAt(0) === '/') {
+			// absolute path
+			return _getContext(newPath);
+		} else {
+			return _getContext(this.path + '/' + newPath);
+		}
+	}
+	
+	// API mapping sets
+	var API_MAP = {
+		'referenceDiagramObject' : {
+			names		: ['fireEvent'],
+			methods		: [_fireEvent]
+		},
+		'default' : {
+			names		: ['get'],
+			methods		: [_getNewContext]
+		}
+	}
+	
+	function _createApi(o, sets, addDefaults) {
+		
+		addDefaults = addDefaults === false ? false : true;
+		
+		sets = $.isArray(sets) ? sets : [sets];
+		
+		if (addDefaults) {
+			sets.unshift('default');
+		}
+		
+		for (var i = 0, li = sets.length; i < li; i++) {
+			var s = sets[i];
+			for (var j = 0, lj = s.names.length; j < lj; j++) {
+				o[s.names[j]] = s.methods[j];
+			}
+		}
+		
+	}
+    
+    // Context class
+    function Context(path, scriptId) {
+    	
+    	var _dataset = {};
+    	
+    	Object.defineProperty(this, 'path', {
+    		get : function() {
+    			return path;
+    		}
+    	});
+    	
+    	Object.defineProperty(this, 'scriptId', {
+    		get : function() {
+    			return scriptId;
+    		}
+    	});
+    	
+    	Object.defineProperty(this, 'dataset', {
+    		get : function() {
+    			return _dataset;
+    		}
+    	});
+    	
+    	_createApi(this, $axure.getTypeFromScriptId(scriptId));
+    	
+    }
+    
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Initialization
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // traverse axure object model and record appropriate values 
+    function _traversePage() {
+    	var fnIdx = 0, scriptIdx = 0;
+    	var pathObj;
+    	
+    	function traverseDiagramObject(diagramObject, path) {
+    		console.log('traverseDiagramObject:' + path);
+    		console.dir(diagramObject);
+    		walkDiagramObjects(diagramObject.objects, path);
+    	}
+    	
+    	function walkDiagramObjects(objects, path) {
+    		var o, mo, po, newPath, scriptId;
+    		for (var i = 0, li = objects.length; i < li; i++) {
+    			o = objects[i];
+    			if (typeof(o.label) !== "undefined") {
+    				newPath = path + '/' + o.label;
+					po = {
+						path : newPath
+					}
+    				if (o.type === MASTER_REF_TYPE) {
+						po.fnIdx = fnIdx;
+						fnIdx ++;
+						_rdoFnToPath.push(po);
+						traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath);
+	    				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
+	    				po.scriptIdx = scriptIdx;
+	    				po.scriptId = scriptId;
+	    				po.docElement = document.getElementById(scriptId);
+    				} else {
+	    				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
+    				} 
+    				
+    				_pathToContext[newPath] = scriptId;
+    				_scriptIdToPath[scriptId] = newPath;
+    				scriptIdx++;
+
+    				if (o.type === PANEL_REF_TYPE) {
+    					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
+    						traverseDiagramObject(o.diagrams[j], newPath);
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
+		//debugger;
+    	traverseDiagramObject($axure.pageData.page.diagram, '');
+    	
+    	console.dir(_rdoFnToPath);
+    	console.dir(_pathToContext);
+    	console.dir(_scriptIdToPath);
+    	
+    	for (var i = 0, l = _rdoFnToPath.length; i < l; i++) {
+    		_rdoFnToPath[i] = _rdoFnToPath[i].path;
+    	}
+    	
+    	console.dir(_rdoFnToPath);
+    	
+    }
+
+	function _initPageContext() {
+		var p = '/';
+    	_pathToContext[p] = new Context(p);
+    	_currentCallInfo = {
+    		eventName 	: null,
+    		path		: p
+    	};
+	}
+
+	function _wrapRdoFunctions() {
+	    Object.keys(window).forEach(function(k) {
+	        
+	        if (!(window[k] instanceof Function)) {
+	            return;
+	        }
+	        
+	        var r = RDO_RX.exec(k);
+	        var fnIdx, evName, domCtx;
+	        // console.log('Checking:' + k);
+	        if (r) {
+	            
+	            // console.log('Wrapping:' + k);
+	            _wrapRdoFn(parseInt(r[1]), r[2]);
+	            
+	        }
+	    });
+	}
+	
+    // create event wraps for existing event handlers
+	function _wrapEventHandlers() {
+	    $axure(function(o) {return o.type != "referenceDiagramObject";}).getIds().forEach(function(scriptId) {
+		    EVENT_NAMES.forEach(function(eventName) {
+		    	_wrapObjectEventHandlers(scriptId, eventName)
+		    });
+	    });
+	}
+
+	function _startMainHandler(_triggeringVarName) {
+		
+		var 
+		
+		function handleVarChange(msg, data) {
+	    	if (msg === "setGlobalVar" && data.globalVarName === _triggeringVarName && data.globalVarValue.length) {
+	    		console.log('Starting ...');
+	    		
+	    		var scriptContext = {
+	    			callingContext : _stack.length ? _stack[_stack.length - 1] : undefined,
+	    			fireRemoteEvent : _fireRemoteEvent,
+	    			findObjectId : _findObjectId
+	    		}
+	    		
+	    		var scr = "(function(scriptContext) {\n" + data.globalVarValue + "\n});";
+	    		
+	    		$axure.messageCenter.removeMessageListener
+	    		
+	    		
+	    		$axure.globalVariableProvider.setVariableValue(_triggeringVarName, '');
+	    		
+	    		try {
+	    			var fn = eval(scr);
+	    			fn(scriptContext);
+	    		} catch (e) {
+	    			console.log(e);
+	    		}
+	    		
+	    	}
+	    }
+		
+		
+		
+		
+	    // establish variable change listener
+	    $axure.messageCenter.addMessageListener(function(msg, data) {
+	    	if (msg === "setGlobalVar" && data.globalVarName === _triggeringVarName && data.globalVarValue.length) {
+	    		console.log('Starting ...');
+	    		
+	    		var scriptContext = {
+	    			callingContext : _stack.length ? _stack[_stack.length - 1] : undefined,
+	    			fireRemoteEvent : _fireRemoteEvent,
+	    			findObjectId : _findObjectId
+	    		}
+	    		
+	    		var scr = "(function(scriptContext) {\n" + data.globalVarValue + "\n});";
+	    		$axure.globalVariableProvider.setVariableValue(_triggeringVarName, '');
+	    		
+	    		try {
+	    			var fn = eval(scr);
+	    			fn(scriptContext);
+	    		} catch (e) {
+	    			console.log(e);
+	    		}
+	    		
+	    	}
+	    });
+	    
+	}
+    
+    function _init() {
+
+		var _triggeringVarName;
+		
+		if (!$axure.globalVariableProvider.getDefinedVariables().some(function(v) {
+			if ($axure.globalVariableProvider.getVariableValue(v) === 'AXHOOKS') {
+				_triggeringVarName = v;
+				return true;
+			}
+		})) {
+			// no triggering var. nothing to do.
+			return;
+		}
+
+    	_traversePage();
+    	_wrapRdoFunctions();
+    	_wrapEventHandlers();
+    	_startMainHandler(_triggeringVarName);
+    }
+    
+    
+    
+    var AX_QUERY = 'type=referenceDiagramObject';
     
     var _q = $axure.query(AX_QUERY);
     
@@ -60,177 +442,6 @@
     	//console.log(scriptId, eventName, domCtx);
     	//console.dir($._data(domCtx, 'events'));
     	
-    }
-    
-    // make a runtime wrap for future calls of $axure.eventManager.event(scriptId, function)
-    // @param fn - previously used $axure.eventManager.event function
-    // @param eventName - name of the event for context registration
-    function _runtimeWrap(fn, eventName) {
-        return (function(scriptId, finalFn) {
-            return fn(scriptId, function() {
-                _stack.push(_makeStackContext(document.getElementById(scriptId), eventName));
-                finalFn.apply(this, arguments);
-                _stack.pop();
-            });
-        });
-    }
-    
-    
-    // find a rdo function index for object satysfying objPath visible from givent context
-    function _findNewContextScriptId(objPath, diagramElement, idIdx) {
-    	
-    	// find object with label == objPath
-    	
-    	for (var i = 0, n = diagramElement.objects.length; i < n; i++) {
-    		if (diagramElement.objects[i].label === objPath && diagramElement.objects[i].scriptIds.length > idIdx) {
-    			return diagramElement.objects[i].scriptIds[idIdx];
-    		}
-    	}
-    	
-    	// not found
-    	return null;
-    }
-    
-/***
-    function __findNewContextScriptId(objPath, diagramElement, idIdx) {
-    	var pathParts = objPath.split('/'), scriptId, label;
-    	while(pathParts.length) {
-    		label = pathParts.shift();
-    		scriptId = scriptId ? _findByLabel(label, $axure.pageData.scriptIdToObject[scriptId]) _findByLabel(label, diagramElement, idIdx);
-    	}
-    }
-***/
-
-    function _findObjectId(objPath) {
-        if (_stack.length) {
-        	stackCtx = _stack[_stack.length - 1];
-        	return _findNewContextScriptId(objPath, stackCtx.axCtx.parent, stackCtx.axIdx);
-        } else {
-        	// no stack - look from page context
-        	return _findNewContextScriptId(objPath, $axure.pageData.page.diagram, 0);
-        }
-    }
-    
-    function _findObjectIdByPath(objPath) {
-    	var a = $axure.pageData.objectPathToScriptId.sort(function(a,b) {
-    		return a.idPath.length < b.idPath.length ? -1 : a.idPath.length > b.idPath.length ? 1 : 0;
-    	})
-    }
-    
-    function _makePathIndexes() {
-    	console.log('_makePathIndexes');
-    	var _pathToScriptId = {}, _scriptIdToPath = {}, _idPathToPath = {};
-    	$axure.pageData.objectPathToScriptId.slice(0).sort(function(a,b) {
-    		return a.idPath.length < b.idPath.length ? -1 : a.idPath.length > b.idPath.length ? 1 : 0;
-    	}).forEach(function(e) {
-    		
-    		var idPath1 = e.idPath.slice(0, e.idPath.length - 1).join('-');
-    		var oid = $axure.pageData.scriptIdToObject[e.scriptId].id;
-    		var label = $axure.pageData.scriptIdToObject[e.scriptId].label;
-    		var idPath = idPath1.length ? [idPath1, oid].join('-') : oid;
-    		
-    		var path = idPath1.length ? [_idPathToPath[idPath1], label].join('/') : label;
-    		
-    		_idPathToPath[idPath] = path;
-    		_pathToScriptId[path] = e.scriptId;
-    		_scriptIdToPath[e.scriptId] = path;
-    		
-    	});
-    	
-    	$.extend($axure.pageData, {
-    		pathToScriptId : _pathToScriptId,
-    		scriptIdToPath : _scriptIdToPath
-    	});
-    	
-    	console.dir($axure);
-    }
-    
-    _makePathIndexes();
-    
-    function _fireRemoteEvent(objPath, evName) {
-        //debugger;
-        
-        console.log('_fireRemoteEvent:start')
-        
-        var scriptId, stackCtx, fn, fnIdx, fnName;
-        
-        scriptId = _findObjectId(objPath);
-        
-        if (!scriptId) {
-        	// no such an object
-	        console.log('_fireRemoteEvent:not found');
-        	return;
-        }
-        
-        console.log(scriptId);
-        
-        fnIdx = _q.$().index(document.getElementById(scriptId));
-        fnName = 'rdo' + (fnIdx + 1) + evName;
-        
-        console.log(fnName)
-        
-        if (fnIdx != -1) {
-            fn = window[fnName];
-            if (fn instanceof Function) {
-            	// call appropriate event handler
-                fn();
-            }
-        }
-        console.log('_fireRemoteEvent:end');
-    }
-    
-    function _traverse() {
-    	var fnIdx = 0, scriptIdx = 0;
-    	var fnToPath = [], pathObj;
-    	var scriptIdToPath = {};
-    	var pathToScriptId = {};
-    	
-    	function traverseDiagramObject(diagramObject, path) {
-    		console.log('traverseDiagramObject:' + path);
-    		console.dir(diagramObject);
-    		walkDiagramObjects(diagramObject.objects, path);
-    	}
-    	
-    	function walkDiagramObjects(objects, path) {
-    		var o, mo, po, newPath, scriptId;
-    		for (var i = 0, li = objects.length; i < li; i++) {
-    			o = objects[i];
-    			if (typeof(o.label) !== "undefined") {
-    				newPath = path + '/' + o.label;
-					po = {
-						path : newPath
-					}
-    				if (o.type === "referenceDiagramObject") {
-						po.fnIdx = fnIdx;
-						fnIdx ++;
-						fnToPath.push(po);
-						traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath);
-	    				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
-	    				po.scriptIdx = scriptIdx;
-	    				po.scriptId = scriptId;
-	    				po.docElement = document.getElementById(scriptId);
-    				} else {
-	    				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
-    				} 
-    				
-    				pathToScriptId[newPath] = scriptId;
-    				scriptIdToPath[scriptId] = newPath;
-    				scriptIdx++;
-
-    				if (o.type === "dynamicPanel") {
-    					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
-    						traverseDiagramObject(o.diagrams[j], newPath);
-    					}
-    				}
-    			}
-    		}
-    	}
-    	
-		//debugger;
-    	traverseDiagramObject($axure.pageData.page.diagram, '');
-    	console.dir(fnToPath);
-    	console.dir(pathToScriptId);
-    	console.dir(scriptIdToPath);
     }
     
     _traverse();
