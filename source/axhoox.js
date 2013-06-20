@@ -8,6 +8,8 @@
     
     // constants
     
+    var PACKAGE = 'AXHOOX';
+    
     // object type that is a master reference
     var MASTER_REF_TYPE = 'referenceDiagramObject';
     
@@ -95,7 +97,7 @@
     		$domCtx.on(eventName, _wrap(handler, {
 	    		eventName 	: eventName,
 	    		path		: _scriptIdToPath[scriptId]
-    		})));
+    		}));
     	});
     	
     }
@@ -124,7 +126,7 @@
 		var rdoIdx = _rdoFnToPath.indexOf(path);
 		var fn = rdoIdx !== -1 && window['rdo' + rdoIdx + eventName];
 		
-		if (fn instanceOf function) {
+		if (fn instanceof Function) {
 			fn();
 		}
 		
@@ -309,24 +311,26 @@
 
 	function _startMainHandler(_triggeringVarName) {
 		
-		var 
+		var handlerEnabled;
 		
 		function handleVarChange(msg, data) {
-	    	if (msg === "setGlobalVar" && data.globalVarName === _triggeringVarName && data.globalVarValue.length) {
+			
+			if (!handlerEnabled) {
+				return;
+			}
+			
+			
+	    	if (msg === "setGlobalVar" && data.globalVarName === _triggeringVarName) {
 	    		console.log('Starting ...');
 	    		
-	    		var scriptContext = {
-	    			callingContext : _stack.length ? _stack[_stack.length - 1] : undefined,
-	    			fireRemoteEvent : _fireRemoteEvent,
-	    			findObjectId : _findObjectId
-	    		}
+	    		
+	    		var scriptContext = _getContext(_currentCallInfo.path);
 	    		
 	    		var scr = "(function(scriptContext) {\n" + data.globalVarValue + "\n});";
 	    		
-	    		$axure.messageCenter.removeMessageListener
-	    		
-	    		
+	    		handlerEnabled = false;
 	    		$axure.globalVariableProvider.setVariableValue(_triggeringVarName, '');
+	    		handlerEnabled = true;
 	    		
 	    		try {
 	    			var fn = eval(scr);
@@ -337,42 +341,23 @@
 	    		
 	    	}
 	    }
+	    
+	    $axure.messageCenter.addMessageListener(handleVarChange);
 		
-		
-		
-		
-	    // establish variable change listener
-	    $axure.messageCenter.addMessageListener(function(msg, data) {
-	    	if (msg === "setGlobalVar" && data.globalVarName === _triggeringVarName && data.globalVarValue.length) {
-	    		console.log('Starting ...');
-	    		
-	    		var scriptContext = {
-	    			callingContext : _stack.length ? _stack[_stack.length - 1] : undefined,
-	    			fireRemoteEvent : _fireRemoteEvent,
-	    			findObjectId : _findObjectId
-	    		}
-	    		
-	    		var scr = "(function(scriptContext) {\n" + data.globalVarValue + "\n});";
-	    		$axure.globalVariableProvider.setVariableValue(_triggeringVarName, '');
-	    		
-	    		try {
-	    			var fn = eval(scr);
-	    			fn(scriptContext);
-	    		} catch (e) {
-	    			console.log(e);
-	    		}
-	    		
-	    	}
-	    });
+		handlerEnabled = true;
 	    
 	}
     
     function _init() {
+    	
+    	window[PACKAGE] = {
+    		init	: false
+    	};
 
 		var _triggeringVarName;
 		
 		if (!$axure.globalVariableProvider.getDefinedVariables().some(function(v) {
-			if ($axure.globalVariableProvider.getVariableValue(v) === 'AXHOOKS') {
+			if ($axure.globalVariableProvider.getVariableValue(v) === PACKAGE) {
 				_triggeringVarName = v;
 				return true;
 			}
@@ -385,133 +370,13 @@
     	_wrapRdoFunctions();
     	_wrapEventHandlers();
     	_startMainHandler(_triggeringVarName);
+    	
+    	window[PACKAGE].init = true;
     }
     
-    
-    
-    var AX_QUERY = 'type=referenceDiagramObject';
-    
-    var _q = $axure.query(AX_QUERY);
-    
-    var _rdoRx = /^rdo(\d+)(\D+)$/
-    
-    var _stack = [];
-    
-    
-    // prepare new context stack object
-    function _makeStackContext(domCtx, eventName, fnIdx) {
-    	var axCtx = $axure.pageData.scriptIdToObject[domCtx.id];
-    	return {
-    		domCtx	: domCtx,
-    		axCtx	: axCtx,
-    		axIdx	: axCtx.scriptIds.indexOf(domCtx.id),
-    		evName	: eventName,
-    		fnIdx	: fnIdx || false
-    	};
+    if (!Object.hasOwnProperty(window, PACKAGE)) {
+    	init();
     }
-    
-	// wrap given function with context stack preparation and disposal
-    function _wrap(fn, ctx) {
-        // console.log('_wrap');
-        return (function() {
-            //console.log(ctx);
-            _stack.push(ctx);
-            fn.apply(this, arguments);
-            _stack.pop();
-            //console.log('Finished.');
-        });
-    }
-    
-    // wrap previously attached event handler(s)
-    function _wrapEvent(scriptId, eventName) {
-    	var domCtx = document.getElementById(scriptId);
-    	var evInfo = $._data(domCtx, 'events');
-    	if (!evInfo || !evInfo[eventName] || !evInfo[eventName].length) {
-    		return;
-    	}
-    	
-    	var $domCtx = $(domCtx);
-    	
-    	evInfo[eventName].forEach(function(ei) {
-    		var handler = ei.handler;
-    		var axCtx = $axure.pageData.scriptIdToObject[scriptId];
-    		$domCtx.off(eventName, handler);
-    		$domCtx.on(eventName, _wrap(handler, _makeStackContext(domCtx, eventName)));
-    	});
-    	
-    	//console.log(scriptId, eventName, domCtx);
-    	//console.dir($._data(domCtx, 'events'));
-    	
-    }
-    
-    _traverse();
-    
-    // create event wraps for existing event handlers
-    $axure(function(o) {return o.type != "referenceDiagramObject";}).getIds().forEach(function(scriptId) {
-	    EVENT_NAMES.forEach(function(eventName) {
-	    	_wrapEvent(scriptId, eventName);
-	    });
-    })
-
-    // wrap rdo###OnSomething functions
-    Object.keys(window).forEach(function(k) {
-        
-        if (!(window[k] instanceof Function)) {
-            return;
-        }
-        
-        var r = _rdoRx.exec(k);
-        var fnIdx, evName, domCtx;
-        // console.log('Checking:' + k);
-        if (r) {
-            
-            // console.log('Wrapping:' + k);
-            
-            fnIdx = parseInt(r[1]); // index parsed from function name
-            evName = r[2]; // event name parsed from function name
-            domCtx = _q.$().get(fnIdx - 1); // dom element associated with event emiter
-            
-            // console.log('Context prepared.')
-            
-            window[k] = _wrap(window[k], _makeStackContext(domCtx, evName, fnIdx));
-            // console.log('Wrapped:' + k);
-        }
-    });
-    
-    // establish variable change listener
-    $axure.messageCenter.addMessageListener(function(msg, data) {
-    	if (msg === "setGlobalVar" && data.globalVarName === "OnRgMsg" && data.globalVarValue.length) {
-    		console.log('Starting ...');
-    		
-    		var scriptContext = {
-    			callingContext : _stack.length ? _stack[_stack.length - 1] : undefined,
-    			fireRemoteEvent : _fireRemoteEvent,
-    			findObjectId : _findObjectId
-    		}
-    		
-    		var scr = "(function(scriptContext) {\n" + data.globalVarValue + "\n});";
-    		$axure.globalVariableProvider.setVariableValue('OnRgMsg', '');
-    		
-    		try {
-    			var fn = eval(scr);
-    			fn(scriptContext);
-    		} catch (e) {
-    			console.log(e);
-    		}
-    		
-    	}
-    });
-    
-    // console.log('Functions wraped.');
-    
-    // console.log('Extending...');
-    
-    $.extend(true, window, {
-        _rgUtils : {
-            fireRemoteEvent :_fireRemoteEvent,
-            findObjectId : _findObjectId
-        }
-    });
     
     // console.log(window._rgUtils);
     
