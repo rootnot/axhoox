@@ -1,8 +1,10 @@
 ;(function($, $axure) {
     
-    //debugger; blablabla
+    //debugger;
     
     //console.log('Starting...');
+    
+    console.log('starting...');
     
     var AX_QUERY = 'type=referenceDiagramObject';
     var EVENT_NAMES = ['click', 'mouseover', 'mouseout', 'change', 'keyup', 'focus', 'blur' ];
