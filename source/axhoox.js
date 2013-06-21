@@ -22,6 +22,12 @@
     // regexp for querying rdo##AAA type functions
     var RDO_RX = /^rdo(\d+)(\D+)$/;
     
+    // status master name
+    var STATUS_MASTER = 'axhoox-status';
+    
+    // status ready event
+    var STATUS_READY_EVENT = 'AxHooxReady';
+    
     
     // runtime vars
     
@@ -117,17 +123,12 @@
     
 	function _fireRemoteEvent(path, eventName) {
 		
-		path = path || this.path;
-		
 		var rdoIdx = _rdoFnToPath.indexOf(path);
 		var fn = rdoIdx !== -1 && window['rdo' + rdoIdx + eventName];
 		
 		if (fn instanceof Function) {
 			fn();
 		}
-		
-		return this;
-		
 	}
 	
 	
@@ -412,6 +413,13 @@
     	_startMainHandler(_triggeringVarName);
     	
     	window[PACKAGE].init = true;
+    	
+    	// propagate ready events on all status instances
+    	$axure(function(o) {
+    		return o.type === MASTER_REF_TYPE && $axure.pageData.masters[o.masterId].name === STATUS_MASTER;
+    	}).getIds().forEach(function(sid) {
+    		_fireRemoteEvent(_scriptIdToPath[sid], STATUS_READY_EVENT);
+    	});
     }
     
     if (!Object.hasOwnProperty(window, PACKAGE)) {
