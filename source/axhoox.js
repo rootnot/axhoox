@@ -4,8 +4,6 @@
     
     //console.log('Starting...');
     
-    console.log('starting...');
-    
     // constants
     
     var PACKAGE = 'AXHOOX';
@@ -258,8 +256,8 @@
     	var pathObj;
     	
     	function traverseDiagramObject(diagramObject, path) {
-    		console.log('traverseDiagramObject:' + path);
-    		console.dir(diagramObject);
+    		//console.log('traverseDiagramObject:' + path);
+    		//console.dir(diagramObject);
     		walkDiagramObjects(diagramObject.objects, path);
     	}
     	
@@ -301,15 +299,15 @@
 		//debugger;
     	traverseDiagramObject($axure.pageData.page.diagram, '');
     	
-    	console.dir(_rdoFnToPath);
-    	console.dir(_pathToContext);
-    	console.dir(_scriptIdToPath);
+    	//console.dir(_rdoFnToPath);
+    	//console.dir(_pathToContext);
+    	//console.dir(_scriptIdToPath);
     	
     	for (var i = 0, l = _rdoFnToPath.length; i < l; i++) {
     		_rdoFnToPath[i] = _rdoFnToPath[i].path;
     	}
     	
-    	console.dir(_rdoFnToPath);
+    	//console.dir(_rdoFnToPath);
     	
     }
 
@@ -426,7 +424,5 @@
     	_init();
     }
     
-    // console.log(window._rgUtils);
-    
 })(jQuery, $axure);
-//@ sourceURL=__js/axhoox.js
+//### @ sourceURL=__js/axhoox.js
