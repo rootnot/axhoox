@@ -1,2 +1,4 @@
-generated-prototype/**
+generated-prototype/*
+!generated-prototype/__js/
+generated-prototype/__js/*
 !.preserve
