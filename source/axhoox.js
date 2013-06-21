@@ -155,23 +155,75 @@
 		}
 	}
 	
+	//debugger;
+	// flags for API method creation
+	var FL_NONE = 0x00;		// take as is - given function is ready serve as a method
+	var FL_PROXY = 0x01;	// wrap with a proxy function which create appropriate scope 
+	var FL_VAL = 0x02;		// method should return a value instead of default context object return 
+	var FL_ALL = 0xFF;		// future use - all flags enabled
+	
 	// API mapping sets
 	var API_MAP = {
 		'referenceDiagramObject' : {
 			names		: ['fireEvent'],
-			methods		: [_fireEvent]
+			methods		: [_fireEvent],
+			flags		: [FL_NONE]
 		},
 		'Axure:Page' : {
 			names		: ['get'],
-			methods		: [_getNewContext]
+			methods		: [_getNewContext],
+			flags		: [FL_NONE]
+		},
+		'dynamicPanel' : {
+			names		: ['setVisivility', 'setState', 'setNextState', 'setPreviousState', 'getState'],
+			methods		: [SetPanelVisibility, SetPanelState, SetPanelStateNext, SetPanelStatePrevious, GetPanelState],
+			flags		: [FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY | FL_VAL]
+		},
+		'textBox' : {
+			names		: [],
+			methods		: [],
+			flags		: []
+		},
+		'textArea' : {
+			names		: [],
+			methods		: [],
+			flags		: []
+		},
+		'listBox' : {
+			names		: [],
+			methods		: [],
+			flags		: []
+		},
+		'comboBox' : {
+			names		: [],
+			methods		: [],
+			flags		: []
+
+		},
+		'checkbox' : {
+			names		: [],
+			methods		: [],
+			flags		: []
 		},
 		'default' : {
 			names		: ['get', 'getParent'],
-			methods		: [_getNewContext, _getParentContext]
+			methods		: [_getNewContext, _getParentContext],
+			flags		: [FL_NONE, FL_NONE]
 		}
 	}
 	
+	function _createProxy(fn, flags) {
+		return function() {
+			var args = Array.prototype.slice.call(arguments);
+			args.unshift(this.scriptId);
+			var r = fn.apply(null, args);
+			return flags & FL_VAL ? r : this;
+		};
+	}
+	
 	function _createApi(o, sets, addDefaults) {
+		
+		//debugger;
 		
 		addDefaults = addDefaults === false ? false : true;
 		
@@ -187,7 +239,11 @@
 				continue;
 			}
 			for (var j = 0, lj = s.names.length; j < lj; j++) {
-				o[s.names[j]] = s.methods[j];
+				Object.defineProperty(o, s.names[j], {
+					value 		: s.flags[j] & FL_PROXY ? _createProxy(s.methods[j], s.flags[j]) : s.methods[j],
+					writable	: false,
+					enumerable	: false
+				});
 			}
 		}
 		
@@ -296,18 +352,11 @@
     		}
     	}
     	
-		//debugger;
     	traverseDiagramObject($axure.pageData.page.diagram, '');
-    	
-    	//console.dir(_rdoFnToPath);
-    	//console.dir(_pathToContext);
-    	//console.dir(_scriptIdToPath);
     	
     	for (var i = 0, l = _rdoFnToPath.length; i < l; i++) {
     		_rdoFnToPath[i] = _rdoFnToPath[i].path;
     	}
-    	
-    	//console.dir(_rdoFnToPath);
     	
     }
 
@@ -357,7 +406,6 @@
 			if (!handlerEnabled) {
 				return;
 			}
-			
 			
 	    	if (msg === "setGlobalVar" && data.globalVarName === _triggeringVarName) {
 	    		console.log('Starting ...');
