@@ -162,6 +162,10 @@
 			names		: ['fireEvent'],
 			methods		: [_fireEvent]
 		},
+		'Axure:Page' : {
+			names		: ['get'],
+			methods		: [_getNewContext]
+		},
 		'default' : {
 			names		: ['get', 'getParent'],
 			methods		: [_getNewContext, _getParentContext]
@@ -193,7 +197,8 @@
     // Context class
     function Context(path, scriptId) {
     	
-    	var type = scriptId ? $axure.getTypeFromScriptId(scriptId) : $axure.pageData.page.type;
+    	var _iAmPage = typeof(scriptId) === 'undefined';
+    	var type = !_iAmPage ? $axure.getTypeFromScriptId(scriptId) : $axure.pageData.page.type;
     	
     	Object.defineProperties(this, {
     		path : {
@@ -204,7 +209,7 @@
     		scriptId : {
     			value : scriptId,
     			writable : false,
-    			enumerable: true
+    			enumerable: !_iAmPage
 
     		},
     		data : {
@@ -214,13 +219,13 @@
 
     		},
     		label : {
-    			value : scriptId ? $axure.pageData.scriptIdToObject[scriptId].label : undefined,
+    			value : !_iAmPage ? $axure.pageData.scriptIdToObject[scriptId].label : undefined,
     			writable : false,
-    			enumerable: true
+    			enumerable: !_iAmPage
 
     		},
     		page : {
-    			value : _pathToContext['/'],
+    			value : !_iAmPage ? _pathToContext['/'] : this,
     			writable : false,
     			enumerable: true
 
@@ -234,11 +239,11 @@
     		master : {
     			value : type === MASTER_REF_TYPE ? $axure.pageData.masters[$axure.pageData.scriptIdToObject[scriptId].masterId].name : undefined,
     			writable : false,
-    			enumerable: true
+    			enumerable: type === MASTER_REF_TYPE
     		}
     	});
     	
-    	_createApi(this, type);
+    	_createApi(this, type, !_iAmPage);
     	
     }
     
@@ -401,6 +406,7 @@
 		}
 
     	_traversePage();
+    	_initPageContext();
     	_wrapRdoFunctions();
     	_wrapEventHandlers();
     	_startMainHandler(_triggeringVarName);
