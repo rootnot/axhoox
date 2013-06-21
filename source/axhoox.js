@@ -43,12 +43,8 @@
     
     // save calling information object
     function _saveCallInfo(callInfo) {
-    	if (typeof (_currentCallInfo) !== 'undefined') {
-    		
-    		callInfo.restore = _makeRestoreFn(_currentCallInfo);
-    		_currentCallInfo = callInfo;
-    		
-    	}
+		callInfo.restore = _makeRestoreFn(_currentCallInfo);
+		_currentCallInfo = callInfo;
     }
     
     // restore calling information object
@@ -134,6 +130,7 @@
 		
 	}
 	
+	
 	// methods
 	
 	function _fireEvent(eventName) {
@@ -141,11 +138,21 @@
 	}
 	
 	function _getNewContext(newPath) {
-		if (newpath.charAt(0) === '/') {
+		if (newPath.charAt(0) === '/') {
 			// absolute path
 			return _getContext(newPath);
 		} else {
 			return _getContext(this.path + '/' + newPath);
+		}
+	}
+	
+	function _getParentContext() {
+		var path = this.path;
+		if (path.length > 1){
+			path = path.split('/').slice(0, -1).join('/');
+			return _getNewContext(path);
+		} else {
+			return this;
 		}
 	}
 	
@@ -156,8 +163,8 @@
 			methods		: [_fireEvent]
 		},
 		'default' : {
-			names		: ['get'],
-			methods		: [_getNewContext]
+			names		: ['get', 'getParent'],
+			methods		: [_getNewContext, _getParentContext]
 		}
 	}
 	
@@ -172,7 +179,10 @@
 		}
 		
 		for (var i = 0, li = sets.length; i < li; i++) {
-			var s = sets[i];
+			var s = API_MAP[sets[i]];
+			if (typeof(s) === 'undefined') {
+				continue;
+			}
 			for (var j = 0, lj = s.names.length; j < lj; j++) {
 				o[s.names[j]] = s.methods[j];
 			}
@@ -183,27 +193,52 @@
     // Context class
     function Context(path, scriptId) {
     	
-    	var _dataset = {};
+    	var type = scriptId ? $axure.getTypeFromScriptId(scriptId) : $axure.pageData.page.type;
     	
-    	Object.defineProperty(this, 'path', {
-    		get : function() {
-    			return path;
+    	Object.defineProperties(this, {
+    		path : {
+    			value : path,
+    			writable: false,
+    			enumerable: true
+    		},
+    		scriptId : {
+    			value : scriptId,
+    			writable : false,
+    			enumerable: true
+
+    		},
+    		data : {
+    			value : {},
+    			writable : false,
+    			enumerable: true
+
+    		},
+    		label : {
+    			value : scriptId ? $axure.pageData.scriptIdToObject[scriptId].label : undefined,
+    			writable : false,
+    			enumerable: true
+
+    		},
+    		page : {
+    			value : _pathToContext['/'],
+    			writable : false,
+    			enumerable: true
+
+    		},
+    		type : {
+    			value : type,
+    			writable : false,
+    			enumerable: true
+
+    		},
+    		master : {
+    			value : type === MASTER_REF_TYPE ? $axure.pageData.masters[$axure.pageData.scriptIdToObject[scriptId].masterId].name : undefined,
+    			writable : false,
+    			enumerable: true
     		}
     	});
     	
-    	Object.defineProperty(this, 'scriptId', {
-    		get : function() {
-    			return scriptId;
-    		}
-    	});
-    	
-    	Object.defineProperty(this, 'dataset', {
-    		get : function() {
-    			return _dataset;
-    		}
-    	});
-    	
-    	_createApi(this, $axure.getTypeFromScriptId(scriptId));
+    	_createApi(this, type);
     	
     }
     
@@ -323,7 +358,6 @@
 	    	if (msg === "setGlobalVar" && data.globalVarName === _triggeringVarName) {
 	    		console.log('Starting ...');
 	    		
-	    		
 	    		var scriptContext = _getContext(_currentCallInfo.path);
 	    		
 	    		var scr = "(function(scriptContext) {\n" + data.globalVarValue + "\n});";
@@ -375,10 +409,10 @@
     }
     
     if (!Object.hasOwnProperty(window, PACKAGE)) {
-    	init();
+    	_init();
     }
     
     // console.log(window._rgUtils);
     
 })(jQuery, $axure);
-//@ sourceURL=__js/apitest.js
+//@ sourceURL=__js/axhoox.js
