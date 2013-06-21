@@ -1,4 +1,4 @@
 axhooks
 =======
 
-Javascript access to Axure prototype document model
+Just program your Axure prototypes in Java Script !
