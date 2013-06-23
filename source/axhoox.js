@@ -61,8 +61,10 @@
     
     // save calling information object
     function _saveCallInfo(callInfo, args) {
-		callInfo.restore = _makeRestoreFn(_currentCallInfo);
-		callInfo.args = args;
+    	callInfo = $.extend(true, {}, callInfo, {
+    		restore : _makeRestoreFn(_currentCallInfo),
+    		args	: args
+    	});
 		_currentCallInfo = callInfo;
     }
     
