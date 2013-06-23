@@ -177,7 +177,11 @@
 		'dynamicPanel' : {
 			names		: ['setVisivility', 'setState', 'setNextState', 'setPreviousState', 'getState'],
 			methods		: [SetPanelVisibility, SetPanelState, SetPanelStateNext, SetPanelStatePrevious, GetPanelState],
-			flags		: [FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY | FL_VAL]
+			flags		: [FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY | FL_VAL],
+			defaults	: {
+				'setNextState' 		: [false, 'none', '', 0, 'none', '', 0],
+				'setPreviousState' 	: [false, 'none', '', 0, 'none', '', 0]
+			}
 		},
 		'textBox' : {
 			names		: [],
@@ -212,9 +216,11 @@
 		}
 	}
 	
-	function _createProxy(fn, flags) {
+	function _createProxy(fn, flags, defaults) {
+		defaults = defaults || [];
 		return function() {
-			var args = Array.prototype.slice.call(arguments);
+			var args = Array.prototype.slice.call(arguments).concat(defaults.slice(arguments.length));
+			//args = args.concat(defaults.slice(args.length));
 			args.unshift(this.scriptId);
 			var r = fn.apply(null, args);
 			return flags & FL_VAL ? r : this;
@@ -239,8 +245,14 @@
 				continue;
 			}
 			for (var j = 0, lj = s.names.length; j < lj; j++) {
+				
+				if (s.flags[j] & FL_PROXY) {
+					s.methods[j] = _createProxy(s.methods[j], s.flags[j], s.defaults && s.defaults[s.names[j]]);
+					s.flags[j] &= ~FL_PROXY;
+				}
+				
 				Object.defineProperty(o, s.names[j], {
-					value 		: s.flags[j] & FL_PROXY ? _createProxy(s.methods[j], s.flags[j]) : s.methods[j],
+					value 		: s.methods[j],
 					writable	: false,
 					enumerable	: false
 				});
@@ -396,43 +408,32 @@
 		    });
 	    });
 	}
-
+	
 	function _startMainHandler(_triggeringVarName) {
+		var _setVariableValue = $axure.globalVariableProvider.setVariableValue;
 		
-		var handlerEnabled;
 		
-		function handleVarChange(msg, data) {
-			
-			if (!handlerEnabled) {
-				return;
+		// this is the main hook
+		$axure.globalVariableProvider.setVariableValue = function(varname, value) {
+			if (varname !== _triggeringVarName) {
+				return _setVariableValue.apply($axure.globalVariableProvider, arguments);
 			}
+			console.log('Starting ...');
 			
-	    	if (msg === "setGlobalVar" && data.globalVarName === _triggeringVarName) {
-	    		console.log('Starting ...');
-	    		
-	    		var scriptContext = _getContext(_currentCallInfo.path);
-	    		
-	    		var scr = "(function(scriptContext) {\n" + data.globalVarValue + "\n});";
-	    		
-	    		handlerEnabled = false;
-	    		$axure.globalVariableProvider.setVariableValue(_triggeringVarName, '');
-	    		handlerEnabled = true;
-	    		
-	    		try {
-	    			var fn = eval(scr);
-	    			fn(scriptContext);
-	    		} catch (e) {
-	    			console.log(e);
-	    		}
-	    		
-	    	}
-	    }
-	    
-	    $axure.messageCenter.addMessageListener(handleVarChange);
+			var scriptContext = _getContext(_currentCallInfo.path);
+			
+			var scr = "(function(scriptContext) {\n" + value + "\n});";
+			
+			try {
+				var fn = eval(scr);
+				fn(scriptContext);
+			} catch (e) {
+				console.dir(e);
+			}
+		}
 		
-		handlerEnabled = true;
-	    
 	}
+
     
     function _init() {
     	
@@ -473,4 +474,4 @@
     }
     
 })(jQuery, $axure);
-//### @ sourceURL=__js/axhoox.js
+//@### sourceURL=__js/axhoox.js
