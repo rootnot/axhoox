@@ -17,6 +17,20 @@
     // event names for hooks
     var EVENT_NAMES = ['click', 'mouseover', 'mouseout', 'change', 'keyup', 'focus', 'blur' ];
     
+    // special events
+    var SPECIAL_EVENT_NAMES = [
+		'widgetIdToDragDropFunction',
+		'widgetIdToDragFunction',
+		'widgetIdToHideFunction',
+		'widgetIdToMoveFunction',
+		'widgetIdToPanelStateChangeFunction',
+		'widgetIdToShowFunction',
+		'widgetIdToStartDragFunction',
+		'widgetIdToSwipeLeftFunction',
+		'widgetIdToSwipeRightFunction',		
+	];
+
+    
     // regexp for querying rdo##AAA type functions
     var RDO_RX = /^rdo(\d+)(\D+)$/;
     
@@ -211,6 +225,7 @@
 		}
 	}
 	
+	
 	//debugger;
 	// flags for API method creation
 	var FL_NONE = 0x0000;	// take as is - given function is ready serve as a method
@@ -237,6 +252,7 @@
 			methods		: [SetPanelVisibility, _setPanelState, SetPanelStateNext, SetPanelStatePrevious, _getPanelState, _getPanelStates],
 			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_VAL, FL_W],
 			defaults	: {
+				'setVisibility'		: ['toggle', 'none', 0],
 				'setState'			: [0, 'none', '', 0, 'none', '', 0],
 				'setNextState' 		: [false, 'none', '', 0, 'none', '', 0],
 				'setPreviousState' 	: [false, 'none', '', 0, 'none', '', 0]
@@ -281,7 +297,7 @@
 			var args = Array.prototype.slice.call(arguments).concat(defaults.slice(arguments.length));
 			//args = args.concat(defaults.slice(args.length));
 			args.unshift(this.scriptId);
-			var r = fn.apply(FL_THIS ? this : null, args);
+			var r = fn.apply(flags & FL_THIS ? this : null, args);
 			return flags & FL_VAL ? r : this;
 		};
 	}
@@ -468,6 +484,19 @@
 	    });
 	}
 	
+	function _wrapWidgetSpecialEventFunctions() {
+		
+		SPECIAL_EVENT_NAMES.forEach(function(eventName) {
+			for (var scriptId in window[eventName]) {
+				window[eventName][scriptId] = _wrap(window[eventName][scriptId], {
+    				eventName 	: eventName,
+    				path		: _scriptIdToPath[scriptId]
+    			});
+			}
+		})
+		
+	}
+	
 	function _startMainHandler(_triggeringVarName) {
 		var _setVariableValue = $axure.globalVariableProvider.setVariableValue;
 		
@@ -518,6 +547,7 @@
     	_initPageContext();
     	_wrapRdoFunctions();
     	_wrapEventHandlers();
+    	_wrapWidgetSpecialEventFunctions();
     	_startMainHandler(_triggeringVarName);
     	
     	window[PACKAGE].init = true;
