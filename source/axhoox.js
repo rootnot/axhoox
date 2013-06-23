@@ -46,8 +46,9 @@
     }
     
     // save calling information object
-    function _saveCallInfo(callInfo) {
+    function _saveCallInfo(callInfo, args) {
 		callInfo.restore = _makeRestoreFn(_currentCallInfo);
+		callInfo.args = args;
 		_currentCallInfo = callInfo;
     }
     
@@ -61,7 +62,7 @@
 	// wrap any function with an encelope preserving calling info object
     function _wrap(fn, callInfo) {
     	return (function() {
-    		_saveCallInfo(callInfo);
+    		_saveCallInfo(callInfo, Array.prototype.slice.call(arguments));
     		fn.apply(this, arguments);
     		_restoreCallInfo();
     	})
@@ -121,11 +122,13 @@
     
 	function _fireRemoteEvent(path, eventName) {
 		
+		var args = Array.prototype.slice.call(arguments, 2);
+		
 		var rdoIdx = _rdoFnToPath.indexOf(path);
 		var fn = rdoIdx !== -1 && window['rdo' + rdoIdx + eventName];
 		
 		if (fn instanceof Function) {
-			fn();
+			fn.apply(null, args);
 		}
 	}
 	
@@ -133,7 +136,9 @@
 	// methods
 	
 	function _fireEvent(eventName) {
-		_fireRemoteEvent(this.path, eventName);
+		var args = Array.prototype.slice.call(arguments);
+		args.unshift(this.path);
+		_fireRemoteEvent.apply(null, args);
 	}
 	
 	function _getNewContext(newPath) {
@@ -420,13 +425,15 @@
 			}
 			console.log('Starting ...');
 			
-			var scriptContext = _getContext(_currentCallInfo.path);
+			var args = _currentCallInfo.args.slice();
+			args.unshift(_currentCallInfo.eventName);
+			args.unshift(_getContext(_currentCallInfo.path));
 			
-			var scr = "(function(scriptContext) {\n" + value + "\n});";
+			var scr = "(function(scriptContext, eventName) {\n" + value + "\n});";
 			
 			try {
 				var fn = eval(scr);
-				fn(scriptContext);
+				fn.apply(null, args);
 			} catch (e) {
 				console.dir(e);
 			}
