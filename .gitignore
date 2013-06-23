@@ -1,4 +1,4 @@
 generated-prototype/*
-!generated-prototype/__js/
-generated-prototype/__js/*
+!generated-prototype/__axhoox/
+generated-prototype/__axhoox/*
 !.preserve
