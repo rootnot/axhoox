@@ -254,7 +254,7 @@
 			methods		: [SetPanelVisibility, _setPanelState, SetPanelStateNext, SetPanelStatePrevious, _getPanelState, _getPanelStates],
 			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_VAL, FL_W],
 			defaults	: {
-				'setVisibility'		: ['toggle', 'none', 0],
+				'setVisibility'		: ['', 'none', 0],
 				'setState'			: [0, 'none', '', 0, 'none', '', 0],
 				'setNextState' 		: [false, 'none', '', 0, 'none', '', 0],
 				'setPreviousState' 	: [false, 'none', '', 0, 'none', '', 0]
