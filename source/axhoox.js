@@ -229,30 +229,30 @@
 	
 	
 	//debugger;
-	// flags for API method creation
-	var FL_NONE = 0x0000;	// take as is - given function is ready serve as a method
+	// bit flags for API method creation
+	var FL_ASIS = 0x0000;	// take as is - given function is ready to serve as a method
 	var FL_PROXY = 0x0001;	// wrap with a proxy function which create appropriate scope 
-	var FL_VAL = 0x0002;	// method should return a value instead of default context object return 
-	var FL_W = 0x0004;		// writable
-	var FL_THIS = 0x0008	// apply proxied fn to this
-	var FL_ALL = 0xFFFF;	// future use - all flags enabled
+	var FL_VAL = 0x0002;	// proxy method should return a value instead of default context object return 
+	var FL_W = 0x0004;		// writable, enable override
+	var FL_THIS = 0x0008	// proxied fn should be applied to this
+	var FL_ALL = 0xFFFF;	// all flags enabled
 	
 	// API mapping sets
 	var API_MAP = {
 		'referenceDiagramObject' : {
 			names		: ['fireEvent'],
 			methods		: [_fireEvent],
-			flags		: [FL_NONE]
+			flags		: [FL_ASIS]
 		},
 		'Axure:Page' : {
 			names		: ['get'],
 			methods		: [_getNewContext],
-			flags		: [FL_VAL]
+			flags		: [FL_ASIS]
 		},
 		'dynamicPanel' : {
 			names		: ['setVisibility', 'setState', 'setNextState', 'setPreviousState', 'getState', 'getStates'],
 			methods		: [SetPanelVisibility, _setPanelState, SetPanelStateNext, SetPanelStatePrevious, _getPanelState, _getPanelStates],
-			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_VAL, FL_W],
+			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_ASIS, FL_W],
 			defaults	: {
 				'setVisibility'		: ['', 'none', 0],
 				'setState'			: [0, 'none', '', 0, 'none', '', 0],
@@ -289,7 +289,7 @@
 		'default' : {
 			names		: ['get', 'getParent'],
 			methods		: [_getNewContext, _getParentContext],
-			flags		: [FL_NONE, FL_NONE]
+			flags		: [FL_ASIS, FL_ASIS]
 		}
 	}
 	
@@ -308,7 +308,7 @@
 		
 		//debugger;
 		
-		addDefaults = addDefaults === false ? false : true;
+		addDefaults = addDefaults !== false;
 		
 		sets = $.isArray(sets) ? sets : [sets];
 		
