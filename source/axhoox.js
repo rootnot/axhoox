@@ -135,12 +135,14 @@
 	
 	// methods
 	
+	// for masters
 	function _fireEvent(eventName) {
 		var args = Array.prototype.slice.call(arguments);
 		args.unshift(this.path);
 		_fireRemoteEvent.apply(null, args);
 	}
 	
+	// common set
 	function _getNewContext(newPath) {
 		if (newPath.charAt(0) === '/') {
 			// absolute path
@@ -160,12 +162,63 @@
 		}
 	}
 	
+	// for dynamic panels
+	
+	// persist states array in Context instance
+	function _fixPanelStates(states) {
+		Object.defineProperty(this, 'getStates', {
+			value : function() {
+				return states.concat();
+			},
+			writable : false,
+			enumerable : false
+		});
+	}
+	
+	// aquire states array
+	function _getPanelStates() {
+		var axCtx = $axure.pageData.scriptIdToObject[this.scriptId];
+		var s = [];
+		for (var i = 0, l = axCtx.diagrams.length; i < l; i++) {
+			s.push(axCtx.diagrams[i].label);
+		}
+		_fixPanelStates.call(this, s);
+		return this.getStates();
+	}
+	
+	// get current state of dynamic panel
+	function _getPanelState() {
+		var sid = GetPanelState(this.scriptId);
+		var m = sid.match(/^pd(\d+)u\d+$/);
+		if (m) {
+			return this.getStates()[parseInt(m[1])];
+		} else {
+			return '';
+		}
+	}
+	
+	function _setPanelState(scriptId, s) {
+		var states = this.getStates(), i = -1;
+		if (typeof(s) === 'number' && s < states.length) {
+			i = s;
+		} else {
+			i = states.indexOf(s);
+		}
+		if (i !== -1) {
+			var args = Array.prototype.slice.call(arguments);
+			args[1] = 'pd' + i + scriptId;
+			SetPanelState.apply(null, args);
+		}
+	}
+	
 	//debugger;
 	// flags for API method creation
-	var FL_NONE = 0x00;		// take as is - given function is ready serve as a method
-	var FL_PROXY = 0x01;	// wrap with a proxy function which create appropriate scope 
-	var FL_VAL = 0x02;		// method should return a value instead of default context object return 
-	var FL_ALL = 0xFF;		// future use - all flags enabled
+	var FL_NONE = 0x0000;	// take as is - given function is ready serve as a method
+	var FL_PROXY = 0x0001;	// wrap with a proxy function which create appropriate scope 
+	var FL_VAL = 0x0002;	// method should return a value instead of default context object return 
+	var FL_W = 0x0004;		// writable
+	var FL_THIS = 0x0008	// apply proxied fn to this
+	var FL_ALL = 0xFFFF;	// future use - all flags enabled
 	
 	// API mapping sets
 	var API_MAP = {
@@ -177,13 +230,14 @@
 		'Axure:Page' : {
 			names		: ['get'],
 			methods		: [_getNewContext],
-			flags		: [FL_NONE]
+			flags		: [FL_VAL]
 		},
 		'dynamicPanel' : {
-			names		: ['setVisivility', 'setState', 'setNextState', 'setPreviousState', 'getState'],
-			methods		: [SetPanelVisibility, SetPanelState, SetPanelStateNext, SetPanelStatePrevious, GetPanelState],
-			flags		: [FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY | FL_VAL],
+			names		: ['setVisibility', 'setState', 'setNextState', 'setPreviousState', 'getState', 'getStates'],
+			methods		: [SetPanelVisibility, _setPanelState, SetPanelStateNext, SetPanelStatePrevious, _getPanelState, _getPanelStates],
+			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_VAL, FL_W],
 			defaults	: {
+				'setState'			: [0, 'none', '', 0, 'none', '', 0],
 				'setNextState' 		: [false, 'none', '', 0, 'none', '', 0],
 				'setPreviousState' 	: [false, 'none', '', 0, 'none', '', 0]
 			}
@@ -227,7 +281,7 @@
 			var args = Array.prototype.slice.call(arguments).concat(defaults.slice(arguments.length));
 			//args = args.concat(defaults.slice(args.length));
 			args.unshift(this.scriptId);
-			var r = fn.apply(null, args);
+			var r = fn.apply(FL_THIS ? this : null, args);
 			return flags & FL_VAL ? r : this;
 		};
 	}
@@ -258,7 +312,7 @@
 				
 				Object.defineProperty(o, s.names[j], {
 					value 		: s.methods[j],
-					writable	: false,
+					writable	: s.flags[j] & FL_W,
 					enumerable	: false
 				});
 			}
