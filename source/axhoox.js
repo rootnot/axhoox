@@ -397,7 +397,7 @@
 
     // traverse axure object model and record appropriate values 
     function _traversePage() {
-    	var fnIdx = 0, scriptIdx = 0;
+    	var fnIdx = 0, scriptIdx = 0, unlabeledIdx = 0;
     	var pathObj;
     	
     	function traverseDiagramObject(diagramObject, path) {
@@ -406,38 +406,58 @@
     		walkDiagramObjects(diagramObject.objects, path);
     	}
     	
+    	function warnNonLabeled(o, path) {
+    		var txt = 'Fixing non existent label for \n' +
+    		(o.type === MASTER_REF_TYPE ? 'Master:[' + $axure.pageData.masters[o.masterId].name + ']' : o.type) +
+    		'\n@' + path +
+    		'\nThe new label is ' + o.label +
+    		'\nand may appear in other paths.' +
+    		'\nBetter fix it in Axure.';
+    		console.warn(txt);
+    	}
+    	
     	function walkDiagramObjects(objects, path) {
     		var o, mo, po, newPath, scriptId;
     		for (var i = 0, li = objects.length; i < li; i++) {
     			o = objects[i];
-    			if (typeof(o.label) !== "undefined") {
-    				newPath = path + '/' + o.label;
-					po = {
-						path : newPath
-					}
-    				if (o.type === MASTER_REF_TYPE) {
-						po.fnIdx = fnIdx;
-						fnIdx ++;
-						_rdoFnToPath.push(po);
-						traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath);
-	    				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
-	    				po.scriptIdx = scriptIdx;
-	    				po.scriptId = scriptId;
-	    				po.docElement = document.getElementById(scriptId);
-    				} else {
-	    				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
-    				} 
-    				
-    				_pathToContext[newPath] = scriptId;
-    				_scriptIdToPath[scriptId] = newPath;
-    				scriptIdx++;
-
-    				if (o.type === PANEL_REF_TYPE) {
-    					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
-    						traverseDiagramObject(o.diagrams[j], newPath);
-    					}
-    				}
+    			if (o.isContained && o.type === 'richTextPanel' && o.label.length === 0) {
+    				o.label = 'txt';
     			}
+    			if (o.label.length === 0) {
+    				unlabeledIdx++;
+    				o.label = 'unlabeled-' + unlabeledIdx;
+    				warnNonLabeled(o, path);
+    			}
+				newPath = path + '/' + o.label;
+				po = {
+					path : newPath
+				}
+				if (o.type === MASTER_REF_TYPE) {
+					po.fnIdx = fnIdx;
+					fnIdx ++;
+					_rdoFnToPath.push(po);
+					traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath);
+    				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
+    				po.scriptIdx = scriptIdx;
+    				po.scriptId = scriptId;
+    				po.docElement = document.getElementById(scriptId);
+				} else {
+    				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
+				} 
+				
+				_pathToContext[newPath] = scriptId;
+				_scriptIdToPath[scriptId] = newPath;
+				scriptIdx++;
+
+				if (o.type === PANEL_REF_TYPE) {
+					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
+						traverseDiagramObject(o.diagrams[j], newPath);
+					}
+				}
+				
+				if (o.type === 'buttonShape') {
+					traverseDiagramObject(o, newPath);
+				}
     		}
     	}
     	
@@ -567,4 +587,3 @@
     }
     
 })(jQuery, $axure);
-//@### sourceURL=__js/axhoox.js
