@@ -512,27 +512,19 @@
 	
 	function _startMainHandler(_triggeringVarName) {
 		
-		if ($axure.globalVariableProvider._setVariableValue) {
-			$axure.globalVariableProvider.setVariableValue = $axure.globalVariableProvider._setVariableValue;
-			delete $axure.globalVariableProvider._setVariableValue;
-		}
-		
-		
-		$axure.globalVariableProvider._setVariableValue = $axure.globalVariableProvider.setVariableValue;
-		
+		console.log('Registering handler');
+		var _setVariableValue = $axure.globalVariableProvider.setVariableValue;
 		
 		// this is the main hook
 		$axure.globalVariableProvider.setVariableValue = function(varname, value) {
-			if (varname !== _triggeringVarName || !_currentCallInfo.args) {
-				console.log('not properly closed!');
+			if (varname !== _triggeringVarName) {
 				return $axure.globalVariableProvider._setVariableValue.apply($axure.globalVariableProvider, arguments);
+			} else if (value === PACKAGE) {
+				console.log('Probably chrome local delayed message.');
+				return;
 			}
 			console.log('Starting handling...');
-			try {
-				var args = _currentCallInfo.args.slice();
-			} catch(e) {
-				console.log('bingo!');
-			}
+			var args = _currentCallInfo.args.slice();
 			args.unshift(_currentCallInfo.eventName);
 			args.unshift(_getContext(_currentCallInfo.path));
 			
@@ -546,9 +538,9 @@
 			}
 		}
 		
-		$(window).unload(function() {
-			console.log('tara');
-			$axure.globalVariableProvider.setVariableValue = $axure.globalVariableProvider._setVariableValue;
+		$(window).on('beforeunload', function() {
+			console.log('Unregistering handler');
+			$axure.globalVariableProvider.setVariableValue = _setVariableValue;
 			delete $axure.globalVariableProvider._setVariableValue;
 		});
 		
