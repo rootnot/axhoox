@@ -136,11 +136,14 @@
     	return _pathToContext[path];
     }
     
-	function _fireRemoteEvent(path, eventName) {
+	function _fireRemoteEvent(path, eventName, rdoIdx) {
 		
-		var args = Array.prototype.slice.call(arguments, 2);
+		var bIsRdoIdx = typeof(rdoIdx) !== 'undefined';
 		
-		var rdoIdx = _rdoFnToPath.indexOf(path);
+		var args = Array.prototype.slice.call(arguments, bIsRdoIdx ? 3 : 2);
+		
+		rdoIdx = bIsRdoIdx ? rdoIdx : _rdoFnToPath.indexOf(path);
+		
 		var fn = rdoIdx !== -1 && window['rdo' + rdoIdx + eventName];
 		
 		if (fn instanceof Function) {
@@ -153,8 +156,8 @@
 	
 	// for masters
 	function _fireEvent(eventName) {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(this.path);
+		var args = Array.prototype.slice.call(arguments, 1);
+		args.splice(0, 0, this.path, eventName, this.rdoIdx);
 		_fireRemoteEvent.apply(null, args);
 	}
 	
@@ -356,6 +359,11 @@
     			enumerable: !_iAmPage
 
     		},
+    		rdoIdx : {
+    			value : type === MASTER_REF_TYPE ? _rdoFnToPath.indexOf(path) : undefined,
+    			writable: false,
+    			enumerable : type === MASTER_REF_TYPE
+    		},
     		data : {
     			value : {},
     			writable : false,
@@ -397,12 +405,10 @@
 
     // traverse axure object model and record appropriate values 
     function _traversePage() {
-    	var fnIdx = 0, scriptIdx = 0, unlabeledIdx = 0;
+    	var scriptIdx = 0, unlabeledIdx = 0;
     	var pathObj;
     	
     	function traverseDiagramObject(diagramObject, path) {
-    		//console.log('traverseDiagramObject:' + path);
-    		//console.dir(diagramObject);
     		walkDiagramObjects(diagramObject.objects, path);
     	}
     	
@@ -422,25 +428,16 @@
     			o = objects[i];
     			if (o.isContained && o.type === 'richTextPanel' && o.label.length === 0) {
     				o.label = 'txt';
-    			}
-    			if (o.label.length === 0) {
+    			} else if (o.label.length === 0) {
     				unlabeledIdx++;
     				o.label = 'unlabeled-' + unlabeledIdx;
     				warnNonLabeled(o, path);
     			}
 				newPath = path + '/' + o.label;
-				po = {
-					path : newPath
-				}
 				if (o.type === MASTER_REF_TYPE) {
-					po.fnIdx = fnIdx;
-					fnIdx ++;
-					_rdoFnToPath.push(po);
+					_rdoFnToPath.push(newPath);
 					traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath);
     				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
-    				po.scriptIdx = scriptIdx;
-    				po.scriptId = scriptId;
-    				po.docElement = document.getElementById(scriptId);
 				} else {
     				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
 				} 
@@ -453,19 +450,13 @@
 					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
 						traverseDiagramObject(o.diagrams[j], newPath);
 					}
-				}
-				
-				if (o.type === 'buttonShape') {
+				} else if (o.type === 'buttonShape') {
 					traverseDiagramObject(o, newPath);
 				}
     		}
     	}
     	
     	traverseDiagramObject($axure.pageData.page.diagram, '');
-    	
-    	for (var i = 0, l = _rdoFnToPath.length; i < l; i++) {
-    		_rdoFnToPath[i] = _rdoFnToPath[i].path;
-    	}
     	
     }
 
@@ -520,17 +511,28 @@
 	}
 	
 	function _startMainHandler(_triggeringVarName) {
-		var _setVariableValue = $axure.globalVariableProvider.setVariableValue;
+		
+		if ($axure.globalVariableProvider._setVariableValue) {
+			$axure.globalVariableProvider.setVariableValue = $axure.globalVariableProvider._setVariableValue;
+			delete $axure.globalVariableProvider._setVariableValue;
+		}
+		
+		
+		$axure.globalVariableProvider._setVariableValue = $axure.globalVariableProvider.setVariableValue;
 		
 		
 		// this is the main hook
 		$axure.globalVariableProvider.setVariableValue = function(varname, value) {
-			if (varname !== _triggeringVarName) {
-				return _setVariableValue.apply($axure.globalVariableProvider, arguments);
+			if (varname !== _triggeringVarName || !_currentCallInfo.args) {
+				console.log('not properly closed!');
+				return $axure.globalVariableProvider._setVariableValue.apply($axure.globalVariableProvider, arguments);
 			}
-			console.log('Starting ...');
-			
-			var args = _currentCallInfo.args.slice();
+			console.log('Starting handling...');
+			try {
+				var args = _currentCallInfo.args.slice();
+			} catch(e) {
+				console.log('bingo!');
+			}
 			args.unshift(_currentCallInfo.eventName);
 			args.unshift(_getContext(_currentCallInfo.path));
 			
@@ -543,6 +545,12 @@
 				console.dir(e);
 			}
 		}
+		
+		$(window).unload(function() {
+			console.log('tara');
+			$axure.globalVariableProvider.setVariableValue = $axure.globalVariableProvider._setVariableValue;
+			delete $axure.globalVariableProvider._setVariableValue;
+		});
 		
 	}
 
