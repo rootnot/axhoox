@@ -97,6 +97,7 @@
     
     // wrap all handlers for provided eventName and scriptId
     function _wrapObjectEventHandlers(scriptId, eventName) {
+    	
     	var domCtx = document.getElementById(scriptId);
     	var evInfo = $._data(domCtx, 'events');
     	
@@ -109,7 +110,6 @@
     	
     	evInfo[eventName].forEach(function(ei) {
     		var handler = ei.handler;
-    		var axCtx = $axure.pageData.scriptIdToObject[scriptId];
     		$domCtx.off(eventName, handler);
     		$domCtx.on(eventName, _wrap(handler, {
 	    		eventName 	: eventName,
@@ -166,7 +166,7 @@
 			// absolute path
 			return _getContext(newPath);
 		} else {
-			return _getContext(this.path + '/' + newPath);
+			return _getContext(this.path !== '/' ? this.path + '/' + newPath : this.path + newPath);
 		}
 	}
 	
@@ -234,8 +234,8 @@
 		var widget = $('#' + this.scriptId);
 		
 		return new Rectangle(
-			Number(widget.css('top').replace('px', '')),
 			Number(widget.css('left').replace('px', '')),
+			Number(widget.css('top').replace('px', '')),
 			Number(widget.css('width').replace('px', '')),
 			Number(widget.css('height').replace('px', ''))
 		);
@@ -536,9 +536,11 @@
 			} else if (value === PACKAGE) {
 				console.log('Probably chrome local delayed message.');
 				return;
+			} else if (!_currentCallInfo.args) {
+				console.warn('Calling from unknown scope.');
 			}
 			console.log('Starting handling...');
-			var args = _currentCallInfo.args.slice();
+			var args = _currentCallInfo.args ? _currentCallInfo.args.slice() : [];
 			args.unshift(_currentCallInfo.eventName);
 			args.unshift(_getContext(_currentCallInfo.path));
 			
