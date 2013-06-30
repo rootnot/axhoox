@@ -151,7 +151,6 @@
 		}
 	}
 	
-	
 	// methods
 	
 	// for masters
@@ -230,6 +229,19 @@
 		}
 	}
 	
+	function _getRect() {
+		
+		var widget = $('#' + this.scriptId);
+		
+		return new Rectangle(
+			Number(widget.css('top').replace('px', '')),
+			Number(widget.css('left').replace('px', '')),
+			Number(widget.css('width').replace('px', '')),
+			Number(widget.css('height').replace('px', ''))
+		);
+	}
+	
+	
 	
 	//debugger;
 	// bit flags for API method creation
@@ -253,14 +265,16 @@
 			flags		: [FL_ASIS]
 		},
 		'dynamicPanel' : {
-			names		: ['setVisibility', 'setState', 'setNextState', 'setPreviousState', 'getState', 'getStates'],
-			methods		: [SetPanelVisibility, _setPanelState, SetPanelStateNext, SetPanelStatePrevious, _getPanelState, _getPanelStates],
-			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_ASIS, FL_W],
+			names		: ['setVisibility', 'setState', 'setNextState', 'setPreviousState', 'getState', 'getStates', 'moveTo', 'moveBy', 'getRect'],
+			methods		: [SetPanelVisibility, _setPanelState, SetPanelStateNext, SetPanelStatePrevious, _getPanelState, _getPanelStates, MoveWidgetTo, MoveWidgetBy, _getRect],
+			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_ASIS, FL_W, FL_PROXY, FL_PROXY, FL_ASIS],
 			defaults	: {
 				'setVisibility'		: ['', 'none', 0],
 				'setState'			: [0, 'none', '', 0, 'none', '', 0],
 				'setNextState' 		: [false, 'none', '', 0, 'none', '', 0],
-				'setPreviousState' 	: [false, 'none', '', 0, 'none', '', 0]
+				'setPreviousState' 	: [false, 'none', '', 0, 'none', '', 0],
+				'moveTo'			: [0, 0, 'none', 0],
+				'moveBy'			: [0, 0, 'none', 0]
 			}
 		},
 		'textBox' : {
