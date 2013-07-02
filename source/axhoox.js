@@ -192,7 +192,7 @@
 	
 	function _setText(id, txt) {
 
-		var type;
+		var type, $rtf, replaced;
 		
 		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
 			id = GetTextIdFromShape(id);
@@ -202,7 +202,19 @@
 		}
 		
 		if (type === 'richTextPanel') {
-			SetWidgetRichText(id, '<p>' + $('<p>' + txt.replace(/<br\/*>/ig, '\n').replace(/&nbsp;/ig, ' ') + '</p>').text() + '</p>');
+			
+			$rtf = $('#' + id).find('div[id$="_rtf"]');
+			$rtf.find('span').each(function(i) {
+				if (i === 0) {
+					$(this).text(txt);
+				} else {
+					$(this).detach();
+				}
+				replaced = true;
+			});
+			if (!replaced) {
+				SetWidgetRichText(id, '<p><span>' + txt + '</span></p>');
+			}
 		} else {
 			SetWidgetFormText(id, txt);
 		}
