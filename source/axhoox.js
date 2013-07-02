@@ -151,6 +151,66 @@
 		}
 	}
 	
+	function _getRtf(id) {
+		
+		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
+			id = GetTextIdFromShape(id);
+		}
+		
+	    var idQuery = $('#' + id);
+	    if (idQuery.is('div')) {
+
+	        return idQuery.find('div[id$="_rtf"]').html();
+	        
+	    } else if (idQuery.is('input') &&
+	        (idQuery.attr('type') == 'checkbox' || idQuery.attr('type') == 'radio')) {
+	        return idQuery.parent().find('label').find('div[id$="_rtf"]').html();
+	    } else {
+	        return idQuery.val();
+	    }
+	}
+	
+	function _getText(id) {
+		
+		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
+			id = GetTextIdFromShape(id);
+		}
+		
+		return GetWidgetText(id);
+		
+	}
+	
+	function _setRtf(id, htmlText) {
+		
+		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
+			id = GetTextIdFromShape(id);
+		}
+		
+		SetWidgetRichText(id, htmlText);
+		
+	}
+	
+	function _setText(id, txt) {
+
+		var type;
+		
+		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
+			id = GetTextIdFromShape(id);
+			type = 'richTextPanel';
+		} else {
+			type = $axure.getTypeFromScriptId(id);
+		}
+		
+		if (type === 'richTextPanel') {
+			SetWidgetRichText(id, '<p>' + $('<p>' + txt.replace(/<br\/*>/ig, '\n').replace(/&nbsp;/ig, ' ') + '</p>').text() + '</p>');
+		} else {
+			SetWidgetFormText(id, txt);
+		}
+		
+	}
+
+	
+	
 	// methods
 	
 	// for masters
@@ -275,6 +335,22 @@
 				'setPreviousState' 	: [false, 'none', '', 0, 'none', '', 0],
 				'moveTo'			: [0, 0, 'none', 0],
 				'moveBy'			: [0, 0, 'none', 0]
+			}
+		},
+		'richTextPanel' : {
+			names		: ['getText', 'getRtf', 'setRtf', 'setText'],
+			methods		: [_getText, _getRtf, _setRtf, _setText],
+			flags		: [FL_PROXY | FL_VAL, FL_PROXY | FL_VAL, FL_PROXY, FL_PROXY],
+			defaults	: {
+				
+			}
+		},
+		'buttonShape'	: {
+			names		: ['getText', 'getRtf', 'setRtf', 'setText'],
+			methods		: [_getText, _getRtf, _setRtf, _setText],
+			flags		: [FL_PROXY | FL_VAL, FL_PROXY | FL_VAL, FL_PROXY, FL_PROXY],
+			defaults	: {
+				
 			}
 		},
 		'textBox' : {
