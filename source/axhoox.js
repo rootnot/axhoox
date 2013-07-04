@@ -190,31 +190,58 @@
 		
 	}
 	
-	function _setText(id, txt) {
+	function _setText(id, txt, force) {
 
-		var type, $rtf, replaced;
+		var type, styleType, styleProps, finalStyle, diagramObject, currentState, $rtf, $targetSpan, $targetP;
 		
-		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
+		txt = txt || '';
+		
+		diagramObject = $axure.pageData.scriptIdToObject[id];
+		currentState = GetWidgetCurrentState(id);
+		
+		type = styleType = diagramObject.type;
+		
+		if (type === 'buttonShape') {
 			id = GetTextIdFromShape(id);
 			type = 'richTextPanel';
-		} else {
-			type = $axure.getTypeFromScriptId(id);
 		}
 		
 		if (type === 'richTextPanel') {
 			
 			$rtf = $('#' + id).find('div[id$="_rtf"]');
-			$rtf.find('span').each(function(i) {
-				if (i === 0) {
-					$(this).text(txt);
-				} else {
-					$(this).detach();
-				}
-				replaced = true;
-			});
-			if (!replaced) {
-				SetWidgetRichText(id, '<p><span>' + txt + '</span></p>');
+			
+			$targetP = $rtf.children('p:first');
+			
+			var canClone = $targetP.length > 0 && $targetP.children('span').length > 0;
+
+			// taken from axurerp_beforepagescript.js modified a little
+			if (force === true || !canClone) {
+				$targetP = $('<p><span></span></p>');
+				finalStyle = $.extend({}, $axure.pageData.stylesheet.defaultStyles[styleType], diagramObject.style, diagramObject.getStateStyleOverrides('normal'));
+				styleProps = GetCssStyleProperties(finalStyle);
+			} else {
+				$targetP = $targetP.clone();
+				$targetP.children('span:not(:first)').remove();
 			}
+			
+            $targetP.children().text(txt.replace(/\n/g, '--NEWLINE--'));
+            if (styleProps) {
+		        $targetP.find('*').andSelf().each(function (index, element) {
+		            ApplyCssProps(element, styleProps);
+		        });
+	        }
+            
+            SetWidgetRichText(id, $targetP.get(0).outerHTML.replace(/--NEWLINE--/g, '<br/>'));
+
+			if (currentState !== 'normal' && (force === true || !canClone)) {
+				// re apply state overrides
+				styleProps = GetCssStyleProperties(diagramObject.getStateStyleOverrides(currentState));
+				$rtf.find('*').each(function(index, element) {
+					ApplyCssProps(element, styleProps);
+				});
+			}				
+                
+			
 		} else {
 			SetWidgetFormText(id, txt);
 		}
