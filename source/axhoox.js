@@ -1,4 +1,4 @@
-;(function($, $axure) {
+;(function($, $axure, makeSandbox) {
     
     //debugger;
     
@@ -662,7 +662,7 @@
 			var scr = "(function(scriptContext, eventName) {\n" + value + "\n});";
 			
 			try {
-				var fn = eval(scr);
+				var fn = makeSandbox(scr);
 				fn.apply(null, args);
 			} catch (e) {
 				console.dir(e);
@@ -717,4 +717,6 @@
     	_init();
     }
     
-})(jQuery, $axure);
+})(jQuery, $axure, function(scr) {
+	return eval(scr);
+});
