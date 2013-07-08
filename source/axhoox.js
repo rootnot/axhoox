@@ -8,6 +8,8 @@
     
     var PACKAGE = 'AXHOOX';
     
+    var USER_SCRIPT_NAME_PREFIX = PACKAGE.toLowerCase();
+    
     // object type that is a master reference
     var MASTER_REF_TYPE = 'referenceDiagramObject';
     
@@ -741,7 +743,24 @@
 		);
 	}
 	
-	var aCRC32Table = [
+	// generate unique id for a string
+	function CRC32(s) { 
+		var iCRC = 0xFFFFFFFF, bytC, bytT, lngA, r; 
+		var t = CRC32.aCRC32Table;
+		for (var i = 0, l = s.length; i < l; i++) {
+			r = s.charCodeAt(i);
+			do {
+				bytC = r & 0xFF;
+				bytT = (iCRC & 0xFF) ^ bytC; 
+				lngA = iCRC >>> 8; 
+				iCRC = lngA ^ t[bytT];
+				r = r >>> 8;
+			} while (r);
+		} 
+		return '_' + ((iCRC ^ 0xFFFFFFFF) >>> 0).toString(16) + '_'; 
+	}
+	
+	CRC32.aCRC32Table = [
 		0x0, 0x77073096, 0xEE0E612C, 0x990951BA, 0x76DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3, 
 		0xEDB8832, 0x79DCB8A4,	0xE0D5E91E, 0x97D2D988, 0x9B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91, 
 		0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE, 0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7, 
@@ -775,17 +794,6 @@
 		0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF, 
 		0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
 	];
-		
-	function CRC32(sMessage) { 
-		var iCRC = 0xFFFFFFFF, bytC, bytT, lngA, i; 
-		for (i=0;i<sMessage.length;i++) { 
-			bytC = sMessage.charCodeAt(i); 
-			bytT = (iCRC & 0xFF) ^ bytC; 
-			lngA = iCRC >> 8; 
-			iCRC = lngA ^ aCRC32Table[bytT]; 
-		} 
-		return iCRC ^ 0xFFFFFFFF; 
-	}
 	
 	function _prepareMasterContextHandler(varname, value) {
 		
@@ -795,7 +803,6 @@
 			return;
 		}
 		
-		console.log('Starting handling in the AxHooxPrepareMasterContext mode...');
 		args = _currentCallInfo.args ? _currentCallInfo.args.slice() : [];
 		
 		scriptId = _pathToContext[_currentCallInfo.path];
@@ -806,7 +813,7 @@
 			
 			if (owner.hasOwnProperty('_axHooxMasterContext')) {
 				// already defined. nothing to do
-				console.log('Master Context already set. Returning.');
+				// console.log('Master Context already set. Returning.');
 				return;
 			}
 			
@@ -819,13 +826,15 @@
 			scriptParams = 'prepareMasterContext, preparePageContext, eventName';
 		}
 		
-		var crc = CRC32(value).toString(16);
+		console.log('Starting handling in the AxHooxPrepareMasterContext mode...');
+		var crc = CRC32(value);
 		try {
-			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox("(function(" + scriptParams + ") {\n" + value + "\n});"));
+			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox("(function usr_fn" + crc + "(" + scriptParams + ") {\n" + value + "\n});", USER_SCRIPT_NAME_PREFIX + crc));
 			fn.apply(null, args);
 		} catch (e) {
-			console.dir(e);
+			console.error(e);
 		}
+		console.log('Finished.');
 	}
 	
 	function _regularHandler(varname, value) {
@@ -834,18 +843,19 @@
 			return;
 		}
 		
-		console.log('Starting handling...');
+		console.time('Regular handler');
 		var args = _currentCallInfo.args ? _currentCallInfo.args.slice() : [];
 		args.unshift(_currentCallInfo.eventName);
 		args.unshift(_getContext(_currentCallInfo.path));
 		
-		var crc = CRC32(value).toString(16);
+		var crc = CRC32(value);
 		try {
-			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox("(function(scriptContext, eventName) {\n" + value + "\n});"));
+			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox("(function usr_fn" + crc + "(scriptContext, eventName) {\n" + value + "\n});", USER_SCRIPT_NAME_PREFIX + crc));
 			fn.apply(null, args);
 		} catch (e) {
-			console.dir(e);
+			console.error(e.toString(), e.stack || '');
 		}
+		console.timeEnd('Regular handler');
 	}
 	
 	function _setHandler(handler, save) {
@@ -917,6 +927,7 @@
     	_init();
     }
     
-})(jQuery, $axure, function(scr) {
+})(jQuery, $axure, function(scr, name) {
+	scr += '\n//@ sourceURL=' + window.location.href.match(/(\S+\/)\S+$/)[1] + '__axhoox/' + name + '.js\n';
 	return eval(scr);
 });
