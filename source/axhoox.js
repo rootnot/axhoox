@@ -443,14 +443,19 @@
 			include		: ['base', 'rtf'],
 		},
 		'textBox' : {
+			include		: ['base'],
 		},
 		'textArea' : {
+			include		: ['base'],
 		},
 		'listBox' : {
+			include		: ['base'],
 		},
 		'comboBox' : {
+			include		: ['base'],
 		},
 		'checkbox' : {
+			include		: ['base'],
 		},
 		'base' : {
 			names		: ['get', 'getParent', 'getOwner'],
