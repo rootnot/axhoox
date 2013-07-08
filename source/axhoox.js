@@ -33,7 +33,6 @@
 		'widgetIdToSwipeLeftFunction',
 		'widgetIdToSwipeRightFunction',		
 	];
-
     
     // regexp for querying rdo##AAA type functions
     var RDO_RX = /^rdo(\d+)(\D+)$/;
@@ -169,13 +168,13 @@
     			initContext = $axure.pageData.masters[axObject.masterId]._axHooxMasterContext || _defaultMasterContext;
     		}
     		_pathToContext[path] = o = Object.create(initContext);
-    		Context.call(o, path, scriptId);
+    		Context.call(o, path, scriptId, _scriptIdToOwnerIndex[scriptId]);
+    		delete _scriptIdToOwnerIndex[scriptId];
     		return o;
     	}
     	
     	return _pathToContext[path];
     }
-    
     
     function _getOwnerPath(path) {
     	var scriptId = _pathToContext[path], oidx;
@@ -413,6 +412,7 @@
 	// API mapping sets
 	var API_MAP = {
 		'referenceDiagramObject' : {
+			include		: ['base'],
 			names		: ['fireEvent'],
 			methods		: [_fireEvent],
 			flags		: [FL_ASIS]
@@ -423,6 +423,7 @@
 			flags		: [FL_ASIS]
 		},
 		'dynamicPanel' : {
+			include		: ['base'],
 			names		: ['setVisibility', 'setState', 'setNextState', 'setPreviousState', 'getState', 'getStates', 'moveTo', 'moveBy', 'getRect'],
 			methods		: [SetPanelVisibility, _setPanelState, SetPanelStateNext, SetPanelStatePrevious, _getPanelState, _getPanelStates, MoveWidgetTo, MoveWidgetBy, _getRect],
 			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_ASIS, FL_W, FL_PROXY, FL_PROXY, FL_ASIS],
@@ -436,52 +437,33 @@
 			}
 		},
 		'richTextPanel' : {
-			names		: ['getText', 'getRtf', 'setRtf', 'setText'],
-			methods		: [_getText, _getRtf, _setRtf, _setText],
-			flags		: [FL_PROXY | FL_VAL, FL_PROXY | FL_VAL, FL_PROXY, FL_PROXY],
-			defaults	: {
-				
-			}
+			include		: ['base', 'rtf'],
 		},
 		'buttonShape'	: {
-			names		: ['getText', 'getRtf', 'setRtf', 'setText'],
-			methods		: [_getText, _getRtf, _setRtf, _setText],
-			flags		: [FL_PROXY | FL_VAL, FL_PROXY | FL_VAL, FL_PROXY, FL_PROXY],
-			defaults	: {
-				
-			}
+			include		: ['base', 'rtf'],
 		},
 		'textBox' : {
-			names		: [],
-			methods		: [],
-			flags		: []
 		},
 		'textArea' : {
-			names		: [],
-			methods		: [],
-			flags		: []
 		},
 		'listBox' : {
-			names		: [],
-			methods		: [],
-			flags		: []
 		},
 		'comboBox' : {
-			names		: [],
-			methods		: [],
-			flags		: []
-
 		},
 		'checkbox' : {
-			names		: [],
-			methods		: [],
-			flags		: []
 		},
-		'default' : {
+		'base' : {
 			names		: ['get', 'getParent', 'getOwner'],
 			methods		: [_getNewContext, _getParentContext, _getOwnerContext],
 			flags		: [FL_ASIS, FL_ASIS, FL_ASIS]
-		}
+		},
+		'rtf'	: {
+			names		: ['getText', 'getRtf', 'setRtf', 'setText'],
+			methods		: [_getText, _getRtf, _setRtf, _setText],
+			flags		: [FL_PROXY | FL_VAL, FL_PROXY | FL_VAL, FL_PROXY, FL_PROXY],
+			defaults	: {
+			}
+		},
 	}
 	
 	function _createProxy(fn, flags, defaults) {
@@ -495,21 +477,22 @@
 		};
 	}
 	
-	function _createApi(o, sets, addDefaults) {
+	function _createApi(o, set) {
 		
 		//debugger;
 		
-		addDefaults = addDefaults !== false;
+		var sets = [set];
 		
-		sets = $.isArray(sets) ? sets : [sets];
+		// process includes
+		var inc = API_MAP[set].include;
 		
-		if (addDefaults) {
-			sets.unshift('default');
+		if (inc) {
+			Array.prototype.splice.apply(sets, [0, 0].concat(inc));
 		}
 		
 		for (var i = 0, li = sets.length; i < li; i++) {
 			var s = API_MAP[sets[i]];
-			if (typeof(s) === 'undefined') {
+			if (typeof(s) === 'undefined' || typeof(s.names) === 'undefined' || !s.names.length ) {
 				continue;
 			}
 			for (var j = 0, lj = s.names.length; j < lj; j++) {
@@ -530,7 +513,7 @@
 	}
     
     // Context class
-    function Context(path, scriptId) {
+    function Context(path, scriptId, ownerIndex) {
     	
     	var _iAmPage = typeof(scriptId) === 'undefined';
     	var type = !_iAmPage ? $axure.getTypeFromScriptId(scriptId) : $axure.pageData.page.type;
@@ -553,7 +536,7 @@
     			enumerable : type === MASTER_REF_TYPE
     		},
     		ownerIdx : {
-    			value : _iAmPage ? -1 : _scriptIdToOwnerIndex[scriptId],
+    			value : ownerIndex,
     			writable : false,
     			enumerable : true
     		},
@@ -588,11 +571,7 @@
     		}
     	});
     	
-    	if (!_iAmPage) {
-    		delete _scriptIdToOwnerIndex[scriptId];
-    	}
-    	
-    	_createApi(this, type, !_iAmPage);
+    	_createApi(this, type);
     	
     	this.init();
     	
@@ -662,7 +641,7 @@
 	function _initPageContext() {
 		var p = '/';
     	var po = _pathToContext[p] = Object.create($axure.pageData.page._axHooxPageContext || _defaultPageContext);
-    	Context.call(po, p);
+    	Context.call(po, p, undefined, -1);
     	_currentCallInfo = {
     		eventName 	: null,
     		path		: p
