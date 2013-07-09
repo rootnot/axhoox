@@ -46,10 +46,10 @@
     
     // context objects prototypes
     
-    var _defaultContext = Object.create(Context.prototype, {
+    var _defaultContext = Object.create(Context.prototype, {/*
     	constructor	: {
     		value		: Context,
-    	},
+    	},*/
 		init		: {
 			value		: function() {return this;},
 			writable	: true
@@ -63,8 +63,6 @@
 		}
 	});
 	
-	var _defaultPageContext = Object.create(_defaultContext);
-    
     
     // runtime vars
     
@@ -163,9 +161,10 @@
     		// lazy evauation on a path basis
     		var scriptId = _pathToContext[path];
     		var axObject = $axure.pageData.scriptIdToObject[scriptId];
-    		var o, initContext = _defaultContext;
+    		var o, initContext = _getApiPrototype(axObject.type);
+    		
     		if (axObject.type === MASTER_REF_TYPE) {
-    			initContext = $axure.pageData.masters[axObject.masterId]._axHooxMasterContext || _defaultMasterContext;
+    			initContext = $axure.pageData.masters[axObject.masterId]._axHooxMasterContext || initContext;
     		}
     		_pathToContext[path] = o = Object.create(initContext);
     		Context.call(o, path, scriptId, _scriptIdToOwnerIndex[scriptId]);
@@ -412,6 +411,7 @@
 	// API mapping sets
 	var API_MAP = {
 		'referenceDiagramObject' : {
+			protoroot	: _defaultMasterContext,
 			include		: ['base'],
 			names		: ['fireEvent'],
 			methods		: [_fireEvent],
@@ -475,53 +475,72 @@
 		defaults = defaults || [];
 		return function() {
 			var args = Array.prototype.slice.call(arguments).concat(defaults.slice(arguments.length));
-			//args = args.concat(defaults.slice(args.length));
 			args.unshift(this.scriptId);
 			var r = fn.apply(flags & FL_THIS ? this : null, args);
 			return flags & FL_VAL ? r : this;
 		};
 	}
 	
-	function _createApi(o, set) {
+	function _getApiPrototype(type) {
 		
-		//debugger;
+		var s = API_MAP[type];
 		
-		var sets = [set];
-		
-		// process includes
-		var inc = API_MAP[set].include;
-		
-		if (inc) {
-			Array.prototype.splice.apply(sets, [0, 0].concat(inc));
+		if (s instanceof Context) {
+			return s;
 		}
 		
+		var sets = (s.include || []),
+			p = s.protoroot, 
+			props;
+
 		for (var i = 0, li = sets.length; i < li; i++) {
-			var s = API_MAP[sets[i]];
-			if (typeof(s) === 'undefined' || typeof(s.names) === 'undefined' || !s.names.length ) {
-				continue;
-			}
-			for (var j = 0, lj = s.names.length; j < lj; j++) {
+			
+			var ref = _getApiPrototype(sets[i]);
+			
+			if (!p) {
 				
-				if (s.flags[j] & FL_PROXY) {
-					s.methods[j] = _createProxy(s.methods[j], s.flags[j], s.defaults && s.defaults[s.names[j]]);
-					s.flags[j] &= ~FL_PROXY;
-				}
+				p = ref;
 				
-				Object.defineProperty(o, s.names[j], {
-					value 		: s.methods[j],
-					writable	: s.flags[j] & FL_W,
-					enumerable	: false
+			} else if (!ref.isPrototypeOf(p)) {
+				
+				props = {};
+				Object.getOwnPropertyNames(ref).forEach(function(prop) {
+					props[prop] = Object.getOwnPropertyDescriptor(ref, prop);
 				});
+				p = Object.create(p, props);
+
 			}
+				
 		}
 		
+		props = {
+			type : {
+				value 		: type,
+				writable 	: true,
+				enumerable 	: false
+			}
+		};
+		
+		s.names && s.names.forEach(function(name, j) {
+
+			props[name] = {
+				value 		: s.flags[j] & FL_PROXY ? _createProxy(s.methods[j], s.flags[j], s.defaults && s.defaults[name]) : s.methods[j],
+				writable	: s.flags[j] & FL_W,
+				enumerable	: false
+			}
+			
+		});
+		
+		s = API_MAP[type] = Object.create(p || _defaultContext, props);
+		
+		return s;
+
 	}
     
     // Context class
     function Context(path, scriptId, ownerIndex) {
     	
     	var _iAmPage = typeof(scriptId) === 'undefined';
-    	var type = !_iAmPage ? $axure.getTypeFromScriptId(scriptId) : $axure.pageData.page.type;
     	
     	Object.defineProperties(this, {
     		path : {
@@ -533,50 +552,38 @@
     			value : scriptId,
     			writable : false,
     			enumerable: !_iAmPage
-
     		},
     		rdoIdx : {
-    			value : type === MASTER_REF_TYPE ? _rdoFnToPath.indexOf(path) : undefined,
+    			value : this.type === MASTER_REF_TYPE ? _rdoFnToPath.indexOf(path) : undefined,
     			writable: false,
-    			enumerable : type === MASTER_REF_TYPE
+    			enumerable : false
     		},
     		ownerIdx : {
     			value : ownerIndex,
     			writable : false,
-    			enumerable : true
+    			enumerable : false
     		},
     		data : {
     			value : {},
     			writable : false,
     			enumerable: true
-
     		},
     		label : {
     			value : !_iAmPage ? $axure.pageData.scriptIdToObject[scriptId].label : undefined,
     			writable : false,
     			enumerable: !_iAmPage
-
     		},
     		page : {
     			value : !_iAmPage ? _pathToContext['/'] : this,
     			writable : false,
     			enumerable: true
-
-    		},
-    		type : {
-    			value : type,
-    			writable : false,
-    			enumerable: true
-
     		},
     		master : {
-    			value : type === MASTER_REF_TYPE ? $axure.pageData.masters[$axure.pageData.scriptIdToObject[scriptId].masterId].name : undefined,
+    			value : this.type === MASTER_REF_TYPE ? $axure.pageData.masters[$axure.pageData.scriptIdToObject[scriptId].masterId].name : undefined,
     			writable : false,
-    			enumerable: type === MASTER_REF_TYPE
+    			enumerable: this.type === MASTER_REF_TYPE
     		}
     	});
-    	
-    	_createApi(this, type);
     	
     	this.init();
     	
@@ -645,7 +652,7 @@
 
 	function _initPageContext() {
 		var p = '/';
-    	var po = _pathToContext[p] = Object.create($axure.pageData.page._axHooxPageContext || _defaultPageContext);
+    	var po = _pathToContext[p] = Object.create($axure.pageData.page._axHooxPageContext || _getApiPrototype(PAGE_TYPE));
     	Context.call(po, p, undefined, -1);
     	_currentCallInfo = {
     		eventName 	: null,
@@ -712,7 +719,8 @@
 	function prepareMasterContext(masterName, context) {
 		Object.keys($axure.pageData.masters).some(function(m) {
 			if (m.name === masterName) {
-				m._axHooxMasterContext = $.extend(true, {}, context);
+				m._axHooxMasterContext = Object.create(_getApiPrototype(MASTER_REF_TYPE));
+				$.extend(m._axHooxMasterContext, context);
 				return true;
 			}
 			return false;
@@ -720,11 +728,8 @@
 	}
 	
 	function preparePageContext(context) {
-		$axure.pageData.page._axHooxPageContext = $.extend(
-			true, 
-			Object.create(_defaultPageContext), 
-			context
-		);
+		$axure.pageData.page._axHooxPageContext = Object.create(_getApiPrototype(PAGE_TYPE));
+		$.extend($axure.pageData.page._axHooxPageContext, context);
 	}
 	
 	// generate unique id for a string
@@ -801,7 +806,7 @@
 				return;
 			}
 			
-			owner._axHooxMasterContext = masterContext =  Object.create(_defaultMasterContext);
+			owner._axHooxMasterContext = masterContext =  Object.create(_getApiPrototype(MASTER_REF_TYPE));
 			
 			args.splice(0, 0, masterContext, prepareMasterContext, preparePageContext, _currentCallInfo.eventName);
 			scriptParams = 'masterContext, prepareMasterContext, preparePageContext, eventName';
@@ -810,15 +815,18 @@
 			scriptParams = 'prepareMasterContext, preparePageContext, eventName';
 		}
 		
-		console.log('Starting handling in the AxHooxPrepareMasterContext mode...');
+		console.time('PrepareMasterContext handler');
+		
 		var crc = CRC32(value);
+		
 		try {
 			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox("(function usr_fn" + crc + "(" + scriptParams + ") {\n" + value + "\n});", USER_SCRIPT_NAME_PREFIX + crc));
 			fn.apply(null, args);
 		} catch (e) {
 			console.error(e);
 		}
-		console.log('Finished.');
+		
+		console.timeEnd('PrepareMasterContext handler');
 	}
 	
 	function _regularHandler(varname, value) {
