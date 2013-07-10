@@ -437,10 +437,10 @@
 			}
 		},
 		'richTextPanel' : {
-			include		: ['base', 'rtf'],
+			include		: ['axure-widget'],
 		},
 		'buttonShape'	: {
-			include		: ['base', 'rtf'],
+			include		: ['axure-widget'],
 		},
 		'textBox' : {
 			include		: ['base'],
@@ -456,6 +456,14 @@
 		},
 		'checkbox' : {
 			include		: ['base'],
+		},
+		'axure-widget'  : {
+			include		: ['base', 'rtf', 'state']
+		},
+		'state' : {
+			names		: ['setSelected', 'setNotSelected', 'disable', 'enable', 'getState', 'isSelected', 'isDisabled'],
+			methods		: [SetWidgetSelected, SetWidgetNotSelected, DisableImageWidget, EnableImageWidget, GetWidgetCurrentState, IsWidgetSelected, IsWidgetDisabled],
+			flags		: [FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY, FL_PROXY | FL_VAL, FL_PROXY | FL_VAL, FL_PROXY | FL_VAL]
 		},
 		'base' : {
 			names		: ['get', 'getParent', 'getOwner'],
