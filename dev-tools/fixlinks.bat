@@ -8,7 +8,7 @@ linking source files to their locations in a testing prototype.
 
 IMPORTANT!
 
-You should use this command every time GIT updates (changes) source files.
+You should use this command every time GIT updates (changes) source files or call it from a post-checkout hook script.
 
 :START
 IF EXIST generated-prototype\__axhoox\axhoox.js del generated-prototype\__axhoox\axhoox.js
