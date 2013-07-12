@@ -11,7 +11,12 @@ IMPORTANT!
 You should use this command every time GIT updates (changes) source files or call it from a post-checkout hook script.
 
 :START
-IF EXIST generated-prototype\__axhoox\axhoox.js del generated-prototype\__axhoox\axhoox.js
-mklink /H generated-prototype\__axhoox\axhoox.js source\axhoox.js
-IF EXIST generated-prototype\__axhoox\axhooxload.html del generated-prototype\__axhoox\axhooxload.html
-mklink /H generated-prototype\__axhoox\axhooxload.html source\axhooxload.html
+FOR /F "tokens=*" %%G IN ('dir /S /B %~p0..\source') DO (
+	call :LN %%~pnxG %~p0..\generated-prototype\__axhoox\%%~nxG
+)
+GOTO :EOF
+
+:LN
+IF EXIST "%~f2" del "%~f2"
+mklink /H "%~pnx2" "%~pnx1"
+GOTO :EOF

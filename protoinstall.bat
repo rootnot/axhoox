@@ -1,70 +1,56 @@
 @echo off
 
-goto :START
-
-:_cp
-echo copying:
-echo %~dpf1 
-echo to 
-echo %~dpf2
-copy "%~dpf1" "%~dpf2"
-goto :END
-
-:_ln
-SETLOCAL
-echo hardlinking
-echo %~dpf2 
-echo to 
-echo %~dpf1
-mklink /H "%~dpf2" "%~dpf1"
-ENDLOCAL
-goto :END
-
-:START
+echo(
+echo AXHOOX prototype installation.
 
 IF [%1]==[] (
 	echo USAGE: protoinstall.bat targetdir
-	goto :END
+	goto :EOF
 )
 
 IF NOT EXIST %1 (
-	echo %1 does not exist
-	goto :END
+	echo Target directory
+	echo %1 
+	echo does not exist.
+	goto :EOF
 )
 
 set attr=%~a1
 
 IF /I NOT [%attr:~0,1%] == [d] (
-	echo %1 is not a directory
-	goto :END
+	echo %1 
+	echo is not a directory.
+	goto :EOF
 )
 
 set targetpath=%~f1
+
+echo Installing AXHOOX in %targetpath%
+echo(
 
 IF NOT EXIST "%targetpath%\__axhoox" (
   mkdir  "%targetpath%\__axhoox";
 )
 
-IF /I NOT [%~d1] == [%~d0] (
-	echo Target drive different than source. Files will be copied.
-	set fn=:_cp
-) ELSE (
-	echo Target drive same as source. Files will be hardlinked.
-	set fn=:_ln
+FOR /F "tokens=*" %%G IN ('dir /S /B source') DO (
+	call :_cp "%%~pnxG" "%targetpath%\__axhoox\%%~nxG"
 )
 
-IF EXIST "%targetpath%\__axhoox\axhoox.js" del "%targetpath%\__axhoox\axhoox.js"
-
-call %fn% source\axhoox.js "%targetpath%\__axhoox\axhoox.js"
-
-IF EXIST "%targetpath%\__axhoox\axhooxload.html" del "%targetpath%\__axhoox\axhooxload.html"
-
-call %fn% source\axhooxload.html "%targetpath%\__axhoox\axhooxload.html"
+echo(
 
 IF errorlevel 1 (
 	echo Some tasks went wrong. Runtime errors occured.
 ) ELSE (
-	echo "AXHOOX succesfuly instaled in %targetpath%"
+	echo AXHOOX succesfuly instaled.
 )
 
-:END
+echo(
+
+goto :EOF
+
+:_cp
+echo %~nx1
+IF EXIST "%~dpf2" del "%~dpf2"
+copy "%~dpf1" "%~dpf2" > nul
+goto :EOF
+
