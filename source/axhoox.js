@@ -828,7 +828,10 @@
 		var crc = CRC32(value);
 		
 		try {
-			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox("(function usr_fn" + crc + "(" + scriptParams + ") {\n" + value + "\n});", USER_SCRIPT_NAME_PREFIX + crc));
+			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox.call({
+					scr : "(function usr_fn" + crc + "(" + scriptParams + ") {\n" + value + "\n});",
+					name : USER_SCRIPT_NAME_PREFIX + crc
+				}));
 			fn.apply(null, args);
 		} catch (e) {
 			console.error(e);
@@ -850,7 +853,10 @@
 		
 		var crc = CRC32(value);
 		try {
-			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox("(function usr_fn" + crc + "(scriptContext, eventName) {\n" + value + "\n});", USER_SCRIPT_NAME_PREFIX + crc));
+			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox.call({
+					scr : "(function usr_fn" + crc + "(scriptContext, eventName) {\n" + value + "\n});",
+					name : USER_SCRIPT_NAME_PREFIX + crc
+				}));
 			fn.apply(null, args);
 		} catch (e) {
 			console.error(e.toString(), e.stack || '');
@@ -927,7 +933,7 @@
     	_init();
     }
     
-})(jQuery, $axure, function(scr, name) {
-	scr += '\n//@ sourceURL=' + window.location.href.match(/(\S+\/)\S+$/)[1] + '__axhoox/' + name + '.js\n';
-	return eval(scr);
+})(jQuery, $axure, function() {
+	this.scr += '\n//@ sourceURL=' + window.location.href.match(/(\S+\/)\S+$/)[1] + '__axhoox/' + this.name + '.js\n';
+	return eval(this.scr);
 });
