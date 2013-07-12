@@ -10,7 +10,7 @@ rem Linking subroutine
 
 IF EXIST "%~dpf2" del "%~dpf2"
 
-mklink "%~dpf2" "%~dpf1" > nul
+mklink /H "%~dpf2" "%~dpf1" > nul
 
 echo Done, post-checkout hook installed to %~dpf2
 

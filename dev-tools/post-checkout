@@ -16,12 +16,22 @@ DIFF=`git diff --name-only $PREV_COMMIT..$POST_COMMIT $HOOXSOURCE`
 
 if [[ $DIFF != "" ]]; then
 
-echo "$HOOXSOURCE has changed. Applying fixlinks..."
-cmd.exe /c dev-tools\\fixlinks.bat
+	echo "$HOOXSOURCE has changed. Applying fixlinks..."
+
+	if [ -f dev-tools/fixlinks.bat ]; then
+
+		cmd.exe /c dev-tools\\fixlinks.bat
+		
+	else
+	
+		echo Could not locate fixlinks.bat. Aborting.
+		exit 1
+		
+	fi
 
 else
 
-echo Checkout did not affect files in $HOOXSOURCE
+	echo Checkout did not affect files in $HOOXSOURCE
 
 fi
 
