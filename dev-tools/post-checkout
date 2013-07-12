@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [[ $GIT_DIR == "" ]]; then
+echo Hook script. You should not invoke it directly!
+exit 1
+fi
+ 
+PREV_COMMIT=$1
+POST_COMMIT=$2
+
+HOOXSOURCE="source/"
+
+echo "$0 invoked. Previous commit: ${PREV_COMMIT}. Actual commit: ${POST_COMMIT}"
+ 
+DIFF=`git diff --name-only $PREV_COMMIT..$POST_COMMIT $HOOXSOURCE`
+
+if [[ $DIFF != "" ]]; then
+
+echo "$HOOXSOURCE has changed. Applying fixlinks..."
+cmd.exe /c dev-tools\\fixlinks.bat
+
+else
+
+echo Checkout did not affect files in $HOOXSOURCE
+
+fi
+
+echo Done.
+
+exit 0
