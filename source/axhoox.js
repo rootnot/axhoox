@@ -239,6 +239,15 @@
 		
 	}
 	
+	function _computeObjectStyle(diagramObject, state, excludeDefault) {
+		return $.extend({}, 
+			excludeDefault !== true && $axure.pageData.stylesheet.defaultStyles[diagramObject.type],
+			diagramObject.style && diagramObject.style.baseStyle && $axure.pageData.stylesheet.stylesById[diagramObject.style.baseStyle], 
+			diagramObject.style,
+			typeof(state) === 'string' && state.length > 0 && diagramObject.getStateStyleOverrides(state)
+		);
+	}
+	
 	function _setText(id, txt, force) {
 
 		var type, styleType, styleProps, finalStyle, diagramObject, currentState, $rtf, $targetSpan, $targetP;
@@ -266,7 +275,7 @@
 			// taken from axurerp_beforepagescript.js modified a little
 			if (force === true || !canClone) {
 				$targetP = $('<p><span></span></p>');
-				finalStyle = $.extend({}, $axure.pageData.stylesheet.defaultStyles[styleType], diagramObject.style, diagramObject.getStateStyleOverrides('normal'));
+				finalStyle = _computeObjectStyle(diagramObject, null);
 				styleProps = GetCssStyleProperties(finalStyle);
 			} else {
 				$targetP = $targetP.clone();
@@ -295,6 +304,57 @@
 			SetWidgetFormText(id, txt);
 		}
 		
+	}
+	
+	function _setCustomStyle(scriptId, state, styleName) {
+		
+		if (arguments.length < 3) {
+			styleName = state;
+			state = null;
+		}
+		
+		var customStyle, objectStyle, diagramObject;
+		
+		customStyle = $axure.pageData.stylesheet.customStyles[styleName];
+		
+		if (!customStyle) {
+			return;
+		}
+		
+		diagramObject = $axure.pageData.scriptIdToObject[scriptId];
+		
+		while (diagramObject.isContained) {
+			diagramObject = diagramObject.parent;
+		}
+		
+		objectStyle = diagramObject.style || (diagramObject.style = {});
+		
+		if (typeof(state) === 'string') {
+			if (!objectStyle.stateStyles) {
+				objectStyle.stateStyles = {}
+			}
+			objectStyle = objectStyle.stateStyles[state] || (objectStyle.stateStyles[state] = {});
+		}
+		
+		objectStyle.baseStyle = customStyle.id;
+		
+		var currentState = GetWidgetCurrentState(scriptId);
+		
+		if (currentState === state || currentState === 'normal' && state === null) {
+			// get contents
+			var $div = $('<div>' + $('#' + scriptId).find('div[id$="_rtf"]').html() + '</div>');
+			var $elements = $div.find('*');
+			if ($elements.length > 0) {
+				// apply new style
+				var styleProps = GetCssStyleProperties(_computeObjectStyle(diagramObject, state));
+				$elements.each(function(index, element) {
+					ApplyCssProps(element, styleProps);
+				});
+				// put contents back to widget
+				SetWidgetRichText(scriptId, $div.html());
+			}
+		}
+
 	}
 
 	
@@ -397,7 +457,43 @@
 		);
 	}
 	
-	
+	function _states(sName) {
+		
+		if (!this._states) {
+			Object.defineProperty(this, '_states', {
+				value : {},
+				writable : false,
+				enumerable : false
+			});
+		}
+		
+		var sKey = PACKAGE + '.' + sName;
+		var self = this;
+		
+		if (!this._states.hasOwnProperty(sName)) {
+			this._states[sName] = {};
+			Object.defineProperty(this._states[sName], 'notify', {
+				value : function(fn, thisObj) {
+					$axure.messageCenter.addStateListener(sKey, function(k, s) {
+						fn.call(thisObj || self, sName, s)
+					});
+				},
+				writable : false,
+				enumerable : false
+			});
+			Object.defineProperty(this._states[sName], 'state', {
+				get : function() {
+					return $axure.messageCenter.getState(sKey);
+				},
+				set : function(s) {
+					$axure.messageCenter.setState(sKey, s);
+				},
+				enumerable : false
+			});
+		}
+		
+		return this._states[sName];
+	}
 	
 	//debugger;
 	// bit flags for API method creation
@@ -418,9 +514,9 @@
 			flags		: [FL_ASIS]
 		},
 		'Axure:Page' : {
-			names		: ['get'],
-			methods		: [_getNewContext],
-			flags		: [FL_ASIS]
+			names		: ['get', 'states'],
+			methods		: [_getNewContext, _states],
+			flags		: [FL_ASIS, FL_ASIS]
 		},
 		'dynamicPanel' : {
 			include		: ['base'],
@@ -437,25 +533,28 @@
 			}
 		},
 		'richTextPanel' : {
-			include		: ['axure-widget'],
+			include		: ['axure-widget']
 		},
 		'buttonShape'	: {
-			include		: ['axure-widget'],
+			include		: ['axure-widget']
 		},
 		'textBox' : {
-			include		: ['base'],
+			include		: ['base', 'text']
 		},
 		'textArea' : {
-			include		: ['base'],
+			include		: ['base', 'text']
 		},
 		'listBox' : {
-			include		: ['base'],
+			include		: ['base']
 		},
 		'comboBox' : {
-			include		: ['base'],
+			include		: ['base']
 		},
 		'checkbox' : {
-			include		: ['base'],
+			include		: ['base']
+		},
+		'imageMapRegion' : {
+			include		: ['base']
 		},
 		'axure-widget'  : {
 			include		: ['base', 'rtf', 'state']
@@ -471,9 +570,16 @@
 			flags		: [FL_ASIS, FL_ASIS, FL_ASIS]
 		},
 		'rtf'	: {
-			names		: ['getText', 'getRtf', 'setRtf', 'setText'],
-			methods		: [_getText, _getRtf, _setRtf, _setText],
-			flags		: [FL_PROXY | FL_VAL, FL_PROXY | FL_VAL, FL_PROXY, FL_PROXY],
+			names		: ['getText', 'getRtf', 'setRtf', 'setText', 'setCustomStyle'],
+			methods		: [_getText, _getRtf, _setRtf, _setText, _setCustomStyle],
+			flags		: [FL_PROXY | FL_VAL, FL_PROXY | FL_VAL, FL_PROXY, FL_PROXY, FL_PROXY],
+			defaults	: {
+			}
+		},
+		'text'	: {
+			names		: ['getText', 'setText'],
+			methods		: [_getText, _setText],
+			flags		: [FL_PROXY | FL_VAL, FL_PROXY],
 			defaults	: {
 			}
 		},
@@ -601,6 +707,77 @@
 // Initialization
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	// diagram object access
+
+	// in case of ambiguity of a style settings recorded in diagram objects
+	// we need to modify accessors from $axure.pageData.scriptIdToObject
+	// and diagramObject.parent
+	// to on the fly record access help information about associated script id
+
+
+	// if an object is accessed through child's parent property
+	function _parentAccessor() {
+		if (this._accessHelpScriptId) {
+			this._parent._accessHelpScriptId = GetShapeIdFromText(this._accessHelpScriptId);
+		}
+		return this._parent;
+	}
+
+	// style getter
+	function _styleGetter() {
+		if (this._accessHelpScriptId && !this._styleByScriptId[this._accessHelpScriptId] && this._style) {
+			this._styleByScriptId[this._accessHelpScriptId] = $.extend(true, {}, this._style);
+		}
+		return this._accessHelpScriptId ? this._styleByScriptId[this._accessHelpScriptId] : this._style;
+	}
+	
+	// style setter
+	function _styleSetter(s) {
+		if (this._accessHelpScriptId) {
+			this._styleByScriptId[this._accessHelpScriptId] = s;
+			if (!this._style) {
+				this._style = $.extend(true, {}, s);
+			}
+		} else {
+			this._style = s;
+		}
+	}
+	
+	function _createStyleAccessors(diagramObject) {
+		
+		diagramObject._styleByScriptId = {};
+		
+		if (diagramObject.style) {
+			diagramObject._style = diagramObject.style;
+		}
+		
+		Object.defineProperty(diagramObject, 'style', {
+			get : _styleGetter,
+			set : _styleSetter,
+			enumerable : true
+		});
+	}
+	
+	// and for $axure.pageData.scriptIdToObject access
+	function _createAccessorsForScriptId(scriptId) {
+		var diagramObject = $axure.pageData.scriptIdToObject[scriptId];
+		Object.defineProperty($axure.pageData.scriptIdToObject, scriptId, {
+			get : function() {
+				diagramObject._accessHelpScriptId = scriptId;
+				return diagramObject;
+			},
+			enumerable : true
+		});
+		if (diagramObject.isContained) {
+			diagramObject._parent = diagramObject.parent;
+			Object.defineProperty(diagramObject, 'parent', {
+				get : _parentAccessor,
+				enumerable : true
+			});
+		}
+		_createStyleAccessors(diagramObject);
+	}
+    	
     // traverse axure object model and record appropriate values 
     function _traversePage() {
     	var scriptIdx = 0, unlabeledIdx = 0;
@@ -638,6 +815,10 @@
 				} else {
     				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
 				} 
+				
+				if ( o.scriptIds.length > 1 ) {
+					_createAccessorsForScriptId(scriptId);
+				}
 				
 				_pathToContext[newPath] = scriptId;
 				_scriptIdToOwnerIndex[scriptId] = ownerIdx;
@@ -725,7 +906,8 @@
 	}
 	
 	function prepareMasterContext(masterName, context) {
-		Object.keys($axure.pageData.masters).some(function(m) {
+		Object.keys($axure.pageData.masters).some(function(mid) {
+			var m = $axure.pageData.masters[mid];
 			if (m.name === masterName) {
 				m._axHooxMasterContext = Object.create(_getApiPrototype(MASTER_REF_TYPE));
 				$.extend(m._axHooxMasterContext, context);
@@ -875,6 +1057,25 @@
 		
 		$axure.globalVariableProvider.setVariableValue = handler;
 	}
+	
+	function _fixAxureBugs() {
+		
+		var _GetCssStyleProperties = GetCssStyleProperties;
+		window.GetCssStyleProperties = function GetCssStyleProperties(style) {
+			var toApply = _GetCssStyleProperties(style);
+			// fix for line spaacing default assumed as in Em
+			if (toApply.parProps.lineHeight) {
+				toApply.parProps.lineHeight += 'px';
+			}
+			// the same for font size
+			if (toApply.runProps.fontSize) {
+				toApply.runProps.fontSize += 'px';
+			}
+			
+			return toApply;
+			
+		}
+	}
     
     function _init() {
     	
@@ -891,6 +1092,8 @@
 			// no triggering var. nothing to do.
 			return;
 		}
+
+		_fixAxureBugs();
 
     	_traversePage();
     	_wrapRdoFunctions();
