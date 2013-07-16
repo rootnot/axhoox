@@ -244,6 +244,10 @@
 		
 	}
 	
+	function _setTooltipText(id, txt) {
+		$('#' + id).attr('title', txt);
+	}
+	
 	function _computeObjectStyle(diagramObject, state, excludeDefault) {
 		return $.extend({}, 
 			excludeDefault !== true && $axure.pageData.stylesheet.defaultStyles[diagramObject.type],
@@ -539,7 +543,7 @@
 			}
 		},
 		'hyperlink' : {
-			include		: ['base', 'state']
+			include		: ['base', 'state', 'tooltips']
 		},
 		'richTextPanel' : {
 			include		: ['axure-widget']
@@ -563,7 +567,7 @@
 			include		: ['base']
 		},
 		'imageMapRegion' : {
-			include		: ['base'],
+			include		: ['base', 'tooltips'],
 			names		: ['scrollToThis'],
 			methods		: [ScrollToWidget],
 			flags		: [FL_PROXY],
@@ -572,7 +576,7 @@
 			}
 		},
 		'axure-widget'  : {
-			include		: ['base', 'rtf', 'state']
+			include		: ['base', 'rtf', 'state', 'tooltips']
 		},
 		'state' : {
 			names		: ['setSelected', 'setNotSelected', 'disable', 'enable', 'getState', 'isSelected', 'isDisabled'],
@@ -598,6 +602,11 @@
 			defaults	: {
 			}
 		},
+		'tooltips' : {
+			names		: ['setTooltipText'],
+			methods		: [_setTooltipText],
+			flags		: [FL_PROXY]
+		}
 	}
 	
 	function _createProxy(fn, flags, defaults) {
