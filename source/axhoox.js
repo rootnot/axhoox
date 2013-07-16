@@ -14,7 +14,8 @@
     var MASTER_REF_TYPE = 'referenceDiagramObject', // master reference
     	DYNAMIC_PANEL_TYPE = 'dynamicPanel', // dynamic panel reference
     	PAGE_TYPE = 'Axure:Page', // page
-    	BUTTON_SHAPE_TYPE = 'buttonShape';
+    	BUTTON_SHAPE_TYPE = 'buttonShape',
+    	RICH_TEXT_PANEL_TYPE = 'richTextPanel';
     
     // event names for hooks
     var EVENT_NAMES = ['click', 'mouseover', 'mouseout', 'change', 'keyup', 'focus', 'blur' ];
@@ -265,10 +266,10 @@
 		
 		if (type === BUTTON_SHAPE_TYPE) {
 			id = GetTextIdFromShape(id);
-			type = 'richTextPanel';
+			type = RICH_TEXT_PANEL_TYPE;
 		}
 		
-		if (type === 'richTextPanel') {
+		if (type === RICH_TEXT_PANEL_TYPE) {
 			
 			$rtf = $('#' + id).find('div[id$="_rtf"]');
 			
@@ -537,6 +538,9 @@
 				'moveBy'			: [0, 0, 'none', 0]
 			}
 		},
+		'hyperlink' : {
+			include		: ['base', 'state']
+		},
 		'richTextPanel' : {
 			include		: ['axure-widget']
 		},
@@ -559,7 +563,13 @@
 			include		: ['base']
 		},
 		'imageMapRegion' : {
-			include		: ['base']
+			include		: ['base'],
+			names		: ['scrollToThis'],
+			methods		: [ScrollToWidget],
+			flags		: [FL_PROXY],
+			defaults	: {
+				'scrollToThis'			: [false, true, 'none', 500]
+			}
 		},
 		'axure-widget'  : {
 			include		: ['base', 'rtf', 'state']
@@ -805,7 +815,7 @@
     		var o, mo, po, newPath, scriptId, ownerIdx = _rdoFnToPath.length - 1;
     		for (var i = 0, li = objects.length; i < li; i++) {
     			o = objects[i];
-    			if (o.isContained && o.type === 'richTextPanel' && o.label.length === 0) {
+    			if (o.isContained && o.type === RICH_TEXT_PANEL_TYPE && o.label.length === 0) {
     				o.label = 'txt';
     			} else if (o.label.length === 0) {
     				unlabeledIdx++;
@@ -834,7 +844,7 @@
 					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
 						traverseDiagramObject(o.diagrams[j], newPath);
 					}
-				} else if (o.type === BUTTON_SHAPE_TYPE) {
+				} else if (o.type === BUTTON_SHAPE_TYPE || o.type === RICH_TEXT_PANEL_TYPE && o.objects) {
 					traverseDiagramObject(o, newPath);
 				}
     		}
