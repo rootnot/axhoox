@@ -10,13 +10,11 @@
     
     var USER_SCRIPT_NAME_PREFIX = PACKAGE.toLowerCase();
     
-    // object type that is a master reference
-    var MASTER_REF_TYPE = 'referenceDiagramObject';
-    
-    // object type that is a dynamic panel reference
-    var PANEL_REF_TYPE = 'dynamicPanel';
-    
-    var PAGE_TYPE = 'Axure:Page'
+    // object types corresponding to Axure scheme
+    var MASTER_REF_TYPE = 'referenceDiagramObject', // master reference
+    	DYNAMIC_PANEL_TYPE = 'dynamicPanel', // dynamic panel reference
+    	PAGE_TYPE = 'Axure:Page', // page
+    	BUTTON_SHAPE_TYPE = 'buttonShape';
     
     // event names for hooks
     var EVENT_NAMES = ['click', 'mouseover', 'mouseout', 'change', 'keyup', 'focus', 'blur' ];
@@ -200,9 +198,12 @@
 		}
 	}
 	
-	function _getRtf(id) {
+	function _getRtf(id, diagramObjectType) {
 		
-		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
+		// optimization for when type is already known
+		diagramObjectType = diagramObjectType || $axure.getTypeFromScriptId(id);
+		
+		if (diagramObjectType === BUTTON_SHAPE_TYPE) {
 			id = GetTextIdFromShape(id);
 		}
 		
@@ -221,7 +222,7 @@
 	
 	function _getText(id) {
 		
-		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
+		if ($axure.getTypeFromScriptId(id) === BUTTON_SHAPE_TYPE) {
 			id = GetTextIdFromShape(id);
 		}
 		
@@ -229,9 +230,12 @@
 		
 	}
 	
-	function _setRtf(id, htmlText) {
+	function _setRtf(id, htmlText, diagramObjectType) {
 		
-		if ($axure.getTypeFromScriptId(id) === 'buttonShape') {
+		// optimization for when type is already known
+		diagramObjectType = diagramObjectType || $axure.getTypeFromScriptId(id);
+
+		if (diagramObjectType === BUTTON_SHAPE_TYPE) {
 			id = GetTextIdFromShape(id);
 		}
 		
@@ -259,7 +263,7 @@
 		
 		type = styleType = diagramObject.type;
 		
-		if (type === 'buttonShape') {
+		if (type === BUTTON_SHAPE_TYPE) {
 			id = GetTextIdFromShape(id);
 			type = 'richTextPanel';
 		}
@@ -342,7 +346,8 @@
 		
 		if (currentState === state || currentState === 'normal' && state === null) {
 			// get contents
-			var $div = $('<div>' + $('#' + scriptId).find('div[id$="_rtf"]').html() + '</div>');
+			
+			var $div = $('<div>' + _getRtf(scriptId, diagramObject.type) + '</div>');
 			var $elements = $div.find('*');
 			if ($elements.length > 0) {
 				// apply new style
@@ -351,7 +356,7 @@
 					ApplyCssProps(element, styleProps);
 				});
 				// put contents back to widget
-				SetWidgetRichText(scriptId, $div.html());
+				_setRtf(scriptId, $div.html(), diagramObject.type);
 			}
 		}
 
@@ -825,11 +830,11 @@
 				_scriptIdToPath[scriptId] = newPath;
 				scriptIdx++;
 
-				if (o.type === PANEL_REF_TYPE) {
+				if (o.type === DYNAMIC_PANEL_TYPE) {
 					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
 						traverseDiagramObject(o.diagrams[j], newPath);
 					}
-				} else if (o.type === 'buttonShape') {
+				} else if (o.type === BUTTON_SHAPE_TYPE) {
 					traverseDiagramObject(o, newPath);
 				}
     		}
