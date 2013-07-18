@@ -1,5 +1,4 @@
-### ![axhoox](http://content.screencast.com/users/rootnot/folders/Default/media/44e40dd7-9410-45ac-abbf-bcb757f90a71/logo-300px.png)
-
+# ![axhoox](http://content.screencast.com/users/rootnot/folders/Default/media/112b6f5f-18ca-463b-b892-3a4708f16463/logo-200px.png)
 
 ### Just program your Axure prototypes in Java Script !
 
