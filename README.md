@@ -13,3 +13,5 @@ Just program your Axure prototypes in Java Script !
 		}
   
 		scriptContext.data.YourOwnVariable = 'This is important';
+		
+### Read more in [the wiki](https://github.com/rootnot/axhoox/wiki)
