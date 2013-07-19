@@ -541,12 +541,12 @@
 			methods		: [SetPanelVisibility, _setPanelState, SetPanelStateNext, SetPanelStatePrevious, _getPanelState, _getPanelStates, MoveWidgetTo, MoveWidgetBy, _getRect],
 			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_ASIS, FL_W, FL_PROXY, FL_PROXY, FL_ASIS],
 			defaults	: {
-				'setVisibility'		: ['', 'none', 0],
-				'setState'			: [0, 'none', '', 0, 'none', '', 0],
-				'setNextState' 		: [false, 'none', '', 0, 'none', '', 0],
-				'setPreviousState' 	: [false, 'none', '', 0, 'none', '', 0],
-				'moveTo'			: [0, 0, 'none', 0],
-				'moveBy'			: [0, 0, 'none', 0]
+				'setVisibility'		: ['', 'none', 500],
+				'setState'			: [0, 'none', '', 500, 'none', '', 500],
+				'setNextState' 		: [false, 'none', '', 500, 'none', '', 500],
+				'setPreviousState' 	: [false, 'none', '', 500, 'none', '', 500],
+				'moveTo'			: [0, 0, 'none', 500],
+				'moveBy'			: [0, 0, 'none', 500]
 			}
 		},
 		'hyperlink' : {
