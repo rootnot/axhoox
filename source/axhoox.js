@@ -542,9 +542,9 @@
 			flags		: [FL_PROXY, FL_PROXY | FL_THIS, FL_PROXY, FL_PROXY, FL_ASIS, FL_W, FL_PROXY, FL_PROXY, FL_ASIS],
 			defaults	: {
 				'setVisibility'		: ['', 'none', 500],
-				'setState'			: [0, 'none', '', 500, 'none', '', 500],
-				'setNextState' 		: [false, 'none', '', 500, 'none', '', 500],
-				'setPreviousState' 	: [false, 'none', '', 500, 'none', '', 500],
+				'setState'			: [0, 'none', 'up', 500, 'none', 'up', 500],
+				'setNextState' 		: [false, 'none', 'up', 500, 'none', 'up', 500],
+				'setPreviousState' 	: [false, 'none', 'up', 500, 'none', 'up', 500],
 				'moveTo'			: [0, 0, 'none', 500],
 				'moveBy'			: [0, 0, 'none', 500]
 			}
