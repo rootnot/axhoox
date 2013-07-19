@@ -505,6 +505,13 @@
 		return this._states[sName];
 	}
 	
+	function _setVariable(varName, varValue) {
+		if (varName === _triggeringVarName) {
+			return;
+		}
+		_savedSetVariableValueHandler(varName, String(varValue));
+	}
+	
 	//debugger;
 	// bit flags for API method creation
 	var FL_ASIS = 0x0000;	// take as is - given function is ready to serve as a method
@@ -524,9 +531,9 @@
 			flags		: [FL_ASIS]
 		},
 		'Axure:Page' : {
-			names		: ['get', 'states'],
-			methods		: [_getNewContext, _states],
-			flags		: [FL_ASIS, FL_ASIS]
+			names		: ['get', 'states', 'setVariable', 'getVariable'],
+			methods		: [_getNewContext, _states, _setVariable, GetGlobalVariableValue],
+			flags		: [FL_ASIS, FL_ASIS, FL_ASIS, FL_ASIS]
 		},
 		'dynamicPanel' : {
 			include		: ['base'],
