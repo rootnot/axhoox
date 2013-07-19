@@ -20,9 +20,10 @@ goto :EOF
 :START
 rem Main action
 
-set HOOK_FILE=post-checkout
+set HOOK_FILE=post-checkout-merge
 
-call :INSTALL %~p0\%HOOK_FILE% %~p0..\.git\hooks\%HOOK_FILE%
+call :INSTALL %~p0\%HOOK_FILE% %~p0..\.git\hooks\post-checkout
+call :INSTALL %~p0\%HOOK_FILE% %~p0..\.git\hooks\post-merge
 
 IF errorlevel 1 (
 	echo Some tasks went wrong. Runtime errors occured.
