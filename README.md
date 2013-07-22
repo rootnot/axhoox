@@ -14,7 +14,7 @@
 		scriptContext.data.YourOwnVariable = 'This is important';
 		
 		
-### Read more in [The Wiki](https://github.com/rootnot/axhoox/wiki)
+### Read more in [The Wiki](https://github.com/rootnot/axhoox/wiki) or play with [Demo](http://rootnot.github.io/axhoox/demo/index.html)
 
 #### License and distribution
 
