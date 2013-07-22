@@ -15,3 +15,10 @@
 		
 		
 ### Read more in [The Wiki](https://github.com/rootnot/axhoox/wiki)
+
+#### License and distribution
+
+All software and documents (located in the _/source_, _/dev-tools_ and _/axure-rp-files_ directories) 
+are licensed under the [Creative Commons Attribution-ShareAlike 3.0 Unported License](http://creativecommons.org/licenses/by-sa/3.0/). 
+If you use them please  add a link to AXHOOX (http://rootnot.github.io/axhoox/) somewhere in your prototype or web page.
+
