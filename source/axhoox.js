@@ -391,7 +391,7 @@
 	function _getParentContext() {
 		var path = this.path;
 		if (path.length > 1){
-			path = path.split('/').slice(0, -1).join('/');
+			path = path.split('/').slice(0, -1).join('/') || '/';
 			return _getNewContext(path);
 		} else {
 			return this;
