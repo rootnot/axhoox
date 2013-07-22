@@ -1,0 +1,203 @@
+﻿body {
+    margin: 0px;
+}
+
+div {
+    background-repeat: no-repeat;
+}
+
+.raw_image {
+    width: 100%;
+    height: 100%;
+}
+
+.preload {
+    display: none;
+}
+#main_container {
+}
+
+.form_sketch {
+    border-color: transparent;
+    background-color: transparent;
+}
+
+.u0 {
+    position:absolute;
+    left:320px;
+    top:530px;
+    width:365px;
+    height:60px;
+    ;
+    ;
+    text-align: center;;
+    font-family:'Arial';
+    font-size: 13px;
+    color:#000000;
+    font-style:normal;
+    font-weight:normal;
+    text-decoration:none;
+    
+}
+
+.u1_normal {
+    background-image: url('../Home_files/button_hello_u1_normal.png');
+}
+
+.u1_container {
+    position:absolute;
+    left:412px;
+    top:405px;
+    width:180px;
+    height:80px;
+}
+
+#u1_img {
+    position:absolute;
+    left:-3px;
+    top:-3px;
+    width:186px;
+    height:86px;
+}
+
+.u2 {
+    position:absolute;
+    left:2px;
+    top:32px;
+    width:176px;
+    height:16px;
+    ;
+    ;
+    ;
+    font-family:Arial;
+    text-align:left;
+    word-wrap:break-word;
+}
+
+#u3 {
+    position:absolute;
+    left:470px;
+    top:258px;
+    width:65px;
+    height:33px;
+    overflow:hidden;
+}
+
+#pd0u3 {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:65px;
+    height:33px;
+    
+}
+
+#u4 {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:65px;
+    height:33px;
+    overflow:hidden;
+}
+
+#pd1u4 {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:65px;
+    height:33px;
+    
+}
+
+.u5_normal {
+    background-image: url('../axhoox_starter_inject_files/u5_normal.png');
+}
+
+.u5_container {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:64px;
+    height:32px;
+}
+
+#u5_img {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:64px;
+    height:32px;
+}
+
+.u6 {
+    position:absolute;
+    left:2px;
+    top:8px;
+    width:60px;
+    height:16px;
+    ;
+    ;
+    ;
+    font-family:Arial;
+    text-align:left;
+    word-wrap:break-word;
+}
+
+#pd0u4 {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:65px;
+    height:33px;
+    
+}
+
+.u7_normal {
+    background-image: url('../axhoox_starter_inject_files/u7_normal.png');
+}
+
+.u7_container {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:64px;
+    height:32px;
+}
+
+#u7_img {
+    position:absolute;
+    left:0px;
+    top:0px;
+    width:64px;
+    height:32px;
+}
+
+.u8 {
+    position:absolute;
+    left:2px;
+    top:8px;
+    width:60px;
+    height:16px;
+    ;
+    ;
+    ;
+    font-family:Arial;
+    text-align:left;
+    word-wrap:break-word;
+}
+
+.u11 {
+    position:absolute;
+    left:234px;
+    top:344px;
+    width:535px;
+    height:33px;
+    ;
+    ;
+    ;
+    font-family:Arial;
+    text-align:left;
+    word-wrap:break-word;
+}
+

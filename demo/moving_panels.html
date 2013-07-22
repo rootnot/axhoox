@@ -1,0 +1,139 @@
+﻿<html>
+<head>
+    <title>moving-panels</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="imagetoolbar" content="no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link href="resources/css/jquery-ui-themes.css" type="text/css" rel="stylesheet">
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet">
+    <link href="moving_panels_files/axurerp_pagespecificstyles.css" type="text/css" rel="stylesheet">
+<!--[if IE 6]>
+    <link href="moving_panels_files/axurerp_pagespecificstyles_ie6.css" type="text/css" rel="stylesheet">
+<![endif]-->
+    <script src="data/sitemap.js"></script>
+    <script src="resources/scripts/jquery-1.7.1.min.js"></script>
+    <script src="resources/scripts/axutils.js"></script>
+    <script src="resources/scripts/jquery-ui-1.8.10.custom.min.js"></script>
+    <script src="resources/scripts/axurerp_beforepagescript.js"></script>
+    <script src="resources/scripts/messagecenter.js"></script>
+<script src='moving_panels_files/data.js'></script>
+</head>
+<body>
+<div id="main_container">
+
+<DIV id="u0" style="" data-label="status-container">
+<DIV id="pd0u0" style="" data-label="_">
+<DIV id="u1" style="" data-label="msg">
+<DIV id="pd1u1" style="visibility:hidden;" data-label="ready">
+<div id="u2" class="u2_container" title="Axhoox. Ready. Find out more..."  >
+<div id="u2_img" class="u2_normal detectCanvas"></div>
+<div id="u3" class="u3" style="visibility:hidden;"  >
+<div id="u3_rtf"></div>
+</div>
+</div>
+</DIV>
+<DIV id="pd0u1" style="" data-label="waiting">
+<div id="u4" class="u4_container" title="Axhoox. Waiting for initialization.&nbsp; Find out more..."  >
+<div id="u4_img" class="u4_normal detectCanvas"></div>
+<div id="u5" class="u5" style="visibility:hidden;"  >
+<div id="u5_rtf"></div>
+</div>
+</div>
+</DIV>
+</DIV>
+<DIV id="u6" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:412px; top:55px; width:10px; height:10px;;" data-label="status"></div>
+</DIV>
+</DIV>
+<DIV id="u7" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:1016px; top:90px; width:64px; height:32px;;" data-label="axhoox-starter"></div>
+<DIV id="u8" style="" data-label="center">
+<DIV id="pd0u8" style="" data-label="State1">
+<div id="u9" class="u9_container"   >
+<div id="u9_img" class="u9_normal detectCanvas"></div>
+<div id="u10" class="u10" style="visibility:hidden;"  >
+<div id="u10_rtf"></div>
+</div>
+</div>
+</DIV>
+</DIV>
+<DIV id="u11" style="" data-label="orbit">
+<DIV id="pd0u11" style="" data-label="State1">
+<div id="u12" class="u12_container"   >
+<div id="u12_img" class="u12_normal detectCanvas"></div>
+<div id="u13" class="u13" style="visibility:hidden;"  >
+<div id="u13_rtf"></div>
+</div>
+</div>
+</DIV>
+</DIV>
+<div id="u14" class="u14_container"   data-label="bt-start-stop">
+<div id="u14_img" class="u14_normal detectCanvas"></div>
+<div id="u15" class="u15"  >
+<div id="u15_rtf"><p style="text-align:center;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#666666;">Start orbiting</span></p></div>
+</div>
+</div>
+<TEXTAREA id=u16  class="u16" data-label="page-script"   >var center = scriptContext.page.get('center');
+var orbit = scriptContext.page.get('orbit');
+
+var cRect = center.getRect();
+var oRect = orbit.getRect();
+
+var cX = cRect.x + cRect.width / 2;
+var cY = cRect.y + cRect.height / 2;
+
+var ow2 = oRect.width / 2;
+var oh2 = oRect.height / 2;
+
+var oX = oRect.x + ow2
+var oY = oRect.y + oh2
+
+var radius = Math.sqrt(Math.pow(oX - cX, 2) + Math.pow(oY - cY, 2));
+
+var alpha = 0;
+
+var alphaStep = 5;
+
+var _iid = null;
+
+function doOrbit() {
+&nbsp; alpha += alphaStep;
+&nbsp; var _a = alpha * Math.PI / 180;
+&nbsp; var newX = radius * Math.cos(_a) + cX - ow2;
+&nbsp; var newY = radius * Math.sin(_a) + cY - oh2;
+&nbsp; orbit.moveTo(newX, newY);
+}
+
+function startOrbit() {
+&nbsp; if (_iid === null) {
+&nbsp; &nbsp; _iid = setInterval(doOrbit, 40);
+&nbsp; &nbsp; orbit.data.orbiting = true;
+&nbsp; &nbsp; scriptContext.page.get('bt-start-stop').setText('Stop orbiting', true);
+&nbsp; }
+}
+
+function stopOrbit() {
+&nbsp; if (_iid !== null) {
+&nbsp; &nbsp; orbit.data.orbiting = false;
+&nbsp; &nbsp; scriptContext.page.get('bt-start-stop').setText('Start orbiting', true);
+&nbsp; &nbsp; clearInterval(_iid);
+&nbsp; &nbsp; _iid = null;
+&nbsp; }
+}
+
+orbit.startOrbit = startOrbit;
+orbit.stopOrbit = stopOrbit;
+</TEXTAREA>
+
+<div id="u17" class="u17"  >
+<div id="u17_rtf"><p style="text-align:left;"><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">Script for AxHooxReady</span></p></div>
+</div>
+<div id="u18" class="u18"  >
+<div id="u18_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:28px;font-weight:normal;font-style:normal;text-decoration:none;color:#666666;">Moving dynamic panels</span></p></div>
+</div>
+<div id="u19" class="u19"  >
+<div id="u19_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">Example shows how to use dynamic panel's API</span></p></div>
+</div>
+</div>
+<div class="preload"><img src="axhoox_starter_inject_files/u5_normal.png" width="1" height="1"/><img src="axhoox_starter_inject_files/u7_normal.png" width="1" height="1"/><img src="moving_panels_files/u9_normal.png" width="1" height="1"/><img src="moving_panels_files/u12_normal.png" width="1" height="1"/><img src="moving_panels_files/bt_start_stop_u14_mouseOver.png" width="1" height="1"/><img src="moving_panels_files/bt_start_stop_u14_normal.png" width="1" height="1"/></div>
+</body>
+<script src="resources/scripts/axurerp_pagescript.js"></script>
+<script src="moving_panels_files/axurerp_pagespecificscript.js" charset="utf-8"></script>

@@ -1,0 +1,399 @@
+﻿<html>
+<head>
+    <title>states</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="imagetoolbar" content="no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link href="resources/css/jquery-ui-themes.css" type="text/css" rel="stylesheet">
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet">
+    <link href="states_files/axurerp_pagespecificstyles.css" type="text/css" rel="stylesheet">
+<!--[if IE 6]>
+    <link href="states_files/axurerp_pagespecificstyles_ie6.css" type="text/css" rel="stylesheet">
+<![endif]-->
+    <script src="data/sitemap.js"></script>
+    <script src="resources/scripts/jquery-1.7.1.min.js"></script>
+    <script src="resources/scripts/axutils.js"></script>
+    <script src="resources/scripts/jquery-ui-1.8.10.custom.min.js"></script>
+    <script src="resources/scripts/axurerp_beforepagescript.js"></script>
+    <script src="resources/scripts/messagecenter.js"></script>
+<script src='states_files/data.js'></script>
+</head>
+<body>
+<div id="main_container">
+
+<div id="u0" class="u0_container"   data-label="bg">
+<div id="u0_img" class="u0_normal detectCanvas"></div>
+<div id="u1" class="u1" style="visibility:hidden;"  >
+<div id="u1_rtf"></div>
+</div>
+</div>
+<div id="u2" class="u2"  >
+<div id="u2_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">Selected option</span><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">:</span></p></div>
+</div>
+<div id="u3" class="u3"  data-label="option">
+<div id="u3_rtf"><p style="text-align:left;line-height:22px;"><span style="font-family:Tahoma;font-size:16px;font-weight:normal;font-style:normal;text-decoration:none;color:#CCCCCC;">Option not set. </span></p><p style="text-align:left;line-height:22px;"><span style="font-family:Tahoma;font-size:16px;font-weight:normal;font-style:normal;text-decoration:none;color:#CCCCCC;">Activate container and choose one of the options on the left.</span></p></div>
+</div>
+<div id="u4" class="u4_container"   data-label="title">
+<div id="u4_img" class="u4_normal detectCanvas"></div>
+<div id="u5" class="u5"  >
+<div id="u5_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#999999;">Title text</span></p></div>
+</div>
+</div>
+<div id="u6" data-label="fg" ></div>
+<DIV id="u7" style="" data-label="dp-reset">
+<DIV id="pd0u7" style="" data-label="_">
+<div id="u8" class="u8_container"   data-label="reset">
+<div id="u8_img" class="u8_normal detectCanvas"></div>
+<div id="u9" class="u9"  >
+<div id="u9_rtf"><p style="text-align:center;line-height:11px;"><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#666666;">Clear</span></p></div>
+</div>
+</div>
+</DIV>
+</DIV>
+<DIV id="u10" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:35px; top:264px; width:545px; height:125px;;" data-label="cont-1"></div>
+<DIV id="u11" style="" data-label="status-container">
+<DIV id="pd0u11" style="" data-label="_">
+<DIV id="u12" style="" data-label="msg">
+<DIV id="pd1u12" style="visibility:hidden;" data-label="ready">
+<div id="u13" class="u13_container" title="Axhoox. Ready. Find out more..."  >
+<div id="u13_img" class="u13_normal detectCanvas"></div>
+<div id="u14" class="u14" style="visibility:hidden;"  >
+<div id="u14_rtf"></div>
+</div>
+</div>
+</DIV>
+<DIV id="pd0u12" style="" data-label="waiting">
+<div id="u15" class="u15_container" title="Axhoox. Waiting for initialization.&nbsp; Find out more..."  >
+<div id="u15_img" class="u15_normal detectCanvas"></div>
+<div id="u16" class="u16" style="visibility:hidden;"  >
+<div id="u16_rtf"></div>
+</div>
+</div>
+</DIV>
+</DIV>
+<DIV id="u17" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:412px; top:55px; width:10px; height:10px;;" data-label="status"></div>
+</DIV>
+</DIV>
+<DIV id="u18" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:1016px; top:90px; width:64px; height:32px;;" data-label="axhoox-starter"></div>
+<div id="u19" class="u19"  >
+<div id="u19_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">Target containers</span><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">&nbsp;</span><span style="font-family:Tahoma;font-size:13px;font-weight:normal;font-style:normal;text-decoration:none;color:#333333;">(click to select)</span></p></div>
+</div>
+<TEXTAREA id=u20  class="u20" data-label="option-button-script"   >prepareMasterContext('option-button', {
+&nbsp; &nbsp; onOptionClick : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; // change the currentOption state
+&nbsp; &nbsp; &nbsp; &nbsp; this.page.states('currentOption').state = this.path;
+&nbsp; &nbsp; },
+&nbsp; &nbsp; getOptionText : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; return this.get('option').getText();
+&nbsp; &nbsp; },
+&nbsp; &nbsp; setOptionText : function(txt) {
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('option').setText(txt, true).setTooltipText(txt);
+&nbsp; &nbsp; },
+&nbsp; &nbsp; onOptionsEnabledChange : function(key, state) {
+&nbsp; &nbsp; &nbsp; &nbsp; if (state) {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.get('option').enable();
+&nbsp; &nbsp; &nbsp; &nbsp; } else {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.get('option').disable();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; },
+&nbsp; &nbsp; init : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; // apply for notifications on optionsEnabled state
+&nbsp; &nbsp; &nbsp; &nbsp; var s = this.page.states('optionsEnabled');
+&nbsp; &nbsp; &nbsp; &nbsp; s.notify(this.onOptionsEnabledChange, this);
+&nbsp; &nbsp; }
+});</TEXTAREA>
+
+<div id="u21" class="u21"  >
+<div id="u21_rtf"><p style="text-align:left;"><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">Init script fo</span><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">r option button</span></p></div>
+</div>
+<div id="u22" class="u22_container"   data-label="option">
+<div id="u22_img" class="u22_normal detectCanvas"></div>
+<div id="u23" class="u23"  >
+<div id="u23_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#666666;">Option button text</span></p></div>
+</div>
+</div>
+<DIV id="u24" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:610px; top:264px; width:300px; height:48px;;" data-label="op-1"></div>
+<TEXTAREA id=u25  class="u25" data-label="container-script"   >prepareMasterContext('option-container', {
+&nbsp; &nbsp; toggleActiveState : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; if (this.page.states('currentContainer').state !== this.path) {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.activate();
+&nbsp; &nbsp; &nbsp; &nbsp; } else {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.page.states('currentContainer').state = null;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; },
+&nbsp; &nbsp; activate : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; this.page.states('currentContainer').state = this.path;
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('bg').setSelected();
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('title').setSelected();
+&nbsp; &nbsp; &nbsp; &nbsp; if (!this.optionEmpty) {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.get('dp-reset').setVisibility('visible');
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; },
+&nbsp; &nbsp; deactivate : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('bg').setNotSelected();
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('title').setNotSelected();
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('dp-reset').setVisibility('hidden');
+&nbsp; &nbsp; },
+&nbsp; &nbsp; setTitleText : function(txt) {
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('title').setText(txt, true);
+&nbsp; &nbsp; },
+&nbsp; &nbsp; setOptionText : function(txt) {
+&nbsp; &nbsp; &nbsp; &nbsp; var o = this.get('option');
+&nbsp; &nbsp; &nbsp; &nbsp; if (this.optionEmpty) {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; o.setCustomStyle('container-option-text');
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.get('dp-reset').setVisibility('visible');
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.optionEmpty = false;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; o.setText(txt, true);
+&nbsp; &nbsp; },
+&nbsp; &nbsp; onMouseOver : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; if (this.page.states('currentContainer').state !== this.path) {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.get('bg').setSelected();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; },
+&nbsp; &nbsp; onMouseOut : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; if (this.page.states('currentContainer').state !== this.path) {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; this.get('bg').setNotSelected();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; },
+&nbsp; &nbsp; reset : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; this.optionEmpty = true;
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('dp-reset').setVisibility('hidden');
+&nbsp; &nbsp; },
+&nbsp; &nbsp; init : function() {
+&nbsp; &nbsp; &nbsp; &nbsp; this.reset();
+&nbsp; &nbsp; &nbsp; &nbsp; var t = this.get('title');
+&nbsp; &nbsp; &nbsp; &nbsp; t.setCustomStyle('container-title');
+&nbsp; &nbsp; &nbsp; &nbsp; t.setCustomStyle('selected', 'container-title-selected');
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('dp-reset/reset').setTooltipText('Clear container');
+&nbsp; &nbsp; }
+});</TEXTAREA>
+
+<div id="u26" class="u26"  >
+<div id="u26_rtf"><p style="text-align:left;"><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">Init script fo</span><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">r </span><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">container</span></p></div>
+</div>
+<TEXTAREA id=u27  class="u27" data-label="page-script"   >var currentContainer;
+
+// container activation state listener
+function onContainerActivate(key, path) {
+
+&nbsp; &nbsp; if (currentContainer &amp;&amp; currentContainer.path !== path) {
+&nbsp; &nbsp; &nbsp; &nbsp; currentContainer.deactivate();
+&nbsp; &nbsp; }
+
+&nbsp; &nbsp; currentContainer = path &amp;&amp; this.get(path);
+
+&nbsp; &nbsp; // get optionsEnabled state object
+&nbsp; &nbsp; var optsEnabled = this.states('optionsEnabled');
+
+&nbsp; &nbsp; // change optionsEnabled state. Notifications will be sent
+&nbsp; &nbsp; // to every option on page
+&nbsp; &nbsp; if (!optsEnabled.state &amp;&amp; currentContainer) {
+&nbsp; &nbsp; &nbsp; &nbsp; optsEnabled.state = true;
+&nbsp; &nbsp; } else if (optsEnabled.state &amp;&amp; !currentContainer) {
+&nbsp; &nbsp; &nbsp; &nbsp; optsEnabled.state = false;
+&nbsp; &nbsp; }
+}
+
+// option activation state change listener
+function onOptionActivate(key, path) {
+&nbsp; &nbsp; if (currentContainer) {
+&nbsp; &nbsp; &nbsp; &nbsp; currentContainer.setOptionText(this.get(path).getOptionText())
+&nbsp; &nbsp; }
+}
+
+function initOptions() {
+&nbsp; &nbsp; var options = this.get('option-values').getText().split('\n').slice(0,6);
+&nbsp; &nbsp; options.forEach(function(txt, i) {
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('op-' + (i + 1)).setOptionText(txt);
+&nbsp; &nbsp; }, this);
+}
+
+function initContainers() {
+&nbsp; &nbsp; var titles = this.get('container-titles').getText().split('\n').slice(0,4);
+&nbsp; &nbsp; titles.forEach(function(txt, i) {
+&nbsp; &nbsp; &nbsp; &nbsp; this.get('cont-' + (i + 1)).setTitleText(txt, true);
+&nbsp; &nbsp; }, this);
+}
+
+function init() {
+&nbsp; &nbsp; // apply for notifications on state changes comming from 
+&nbsp; &nbsp; // other objects
+&nbsp; &nbsp; this.states('currentContainer').notify(onContainerActivate);
+&nbsp; &nbsp; this.states('currentOption').notify(onOptionActivate);
+
+&nbsp; &nbsp; // init page objects with text values taken from 
+&nbsp; &nbsp; // appropriate text areas
+&nbsp; &nbsp; this.initOptions();
+&nbsp; &nbsp; this.initContainers();
+
+&nbsp; &nbsp; // set initial value for the optionsEnabled state
+&nbsp; &nbsp; this.states('optionsEnabled').state = false;
+}
+
+preparePageContext({
+&nbsp; &nbsp; init : init,
+&nbsp; &nbsp; initOptions : initOptions,
+&nbsp; &nbsp; initContainers : initContainers
+});</TEXTAREA>
+
+<div id="u28" class="u28"  >
+<div id="u28_rtf"><p style="text-align:left;"><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">Init script fo</span><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">r </span><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">page</span></p></div>
+</div>
+<div id="u29" class="u29_container"   data-label="option">
+<div id="u29_img" class="u29_normal detectCanvas"></div>
+<div id="u30" class="u30"  >
+<div id="u30_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#666666;">Option button text</span></p></div>
+</div>
+</div>
+<DIV id="u31" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:610px; top:322px; width:300px; height:48px;;" data-label="op-2"></div>
+<div id="u32" class="u32_container"   data-label="option">
+<div id="u32_img" class="u32_normal detectCanvas"></div>
+<div id="u33" class="u33"  >
+<div id="u33_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#666666;">Option button text</span></p></div>
+</div>
+</div>
+<DIV id="u34" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:610px; top:380px; width:300px; height:48px;;" data-label="op-3"></div>
+<div id="u35" class="u35_container"   data-label="option">
+<div id="u35_img" class="u35_normal detectCanvas"></div>
+<div id="u36" class="u36"  >
+<div id="u36_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#666666;">Option button text</span></p></div>
+</div>
+</div>
+<DIV id="u37" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:610px; top:438px; width:300px; height:48px;;" data-label="op-4"></div>
+<div id="u38" class="u38_container"   data-label="option">
+<div id="u38_img" class="u38_normal detectCanvas"></div>
+<div id="u39" class="u39"  >
+<div id="u39_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#666666;">Option button text</span></p></div>
+</div>
+</div>
+<DIV id="u40" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:610px; top:496px; width:300px; height:48px;;" data-label="op-5"></div>
+<div id="u41" class="u41_container"   data-label="option">
+<div id="u41_img" class="u41_normal detectCanvas"></div>
+<div id="u42" class="u42"  >
+<div id="u42_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#666666;">Option button text</span></p></div>
+</div>
+</div>
+<DIV id="u43" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:610px; top:554px; width:300px; height:48px;;" data-label="op-6"></div>
+<div id="u44" class="u44_container"   data-label="bg">
+<div id="u44_img" class="u44_normal detectCanvas"></div>
+<div id="u45" class="u45" style="visibility:hidden;"  >
+<div id="u45_rtf"></div>
+</div>
+</div>
+<div id="u46" class="u46"  >
+<div id="u46_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">Selected option</span><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">:</span></p></div>
+</div>
+<div id="u47" class="u47"  data-label="option">
+<div id="u47_rtf"><p style="text-align:left;line-height:22px;"><span style="font-family:Tahoma;font-size:16px;font-weight:normal;font-style:normal;text-decoration:none;color:#CCCCCC;">Option not set. </span></p><p style="text-align:left;line-height:22px;"><span style="font-family:Tahoma;font-size:16px;font-weight:normal;font-style:normal;text-decoration:none;color:#CCCCCC;">Activate container and choose one of the options on the left.</span></p></div>
+</div>
+<div id="u48" class="u48_container"   data-label="title">
+<div id="u48_img" class="u48_normal detectCanvas"></div>
+<div id="u49" class="u49"  >
+<div id="u49_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#999999;">Title text</span></p></div>
+</div>
+</div>
+<div id="u50" data-label="fg" ></div>
+<DIV id="u51" style="" data-label="dp-reset">
+<DIV id="pd0u51" style="" data-label="_">
+<div id="u52" class="u52_container"   data-label="reset">
+<div id="u52_img" class="u52_normal detectCanvas"></div>
+<div id="u53" class="u53"  >
+<div id="u53_rtf"><p style="text-align:center;line-height:11px;"><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#666666;">Clear</span></p></div>
+</div>
+</div>
+</DIV>
+</DIV>
+<DIV id="u54" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:35px; top:399px; width:545px; height:125px;;" data-label="cont-2"></div>
+<div id="u55" class="u55_container"   data-label="bg">
+<div id="u55_img" class="u55_normal detectCanvas"></div>
+<div id="u56" class="u56" style="visibility:hidden;"  >
+<div id="u56_rtf"></div>
+</div>
+</div>
+<div id="u57" class="u57"  >
+<div id="u57_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">Selected option</span><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">:</span></p></div>
+</div>
+<div id="u58" class="u58"  data-label="option">
+<div id="u58_rtf"><p style="text-align:left;line-height:22px;"><span style="font-family:Tahoma;font-size:16px;font-weight:normal;font-style:normal;text-decoration:none;color:#CCCCCC;">Option not set. </span></p><p style="text-align:left;line-height:22px;"><span style="font-family:Tahoma;font-size:16px;font-weight:normal;font-style:normal;text-decoration:none;color:#CCCCCC;">Activate container and choose one of the options on the left.</span></p></div>
+</div>
+<div id="u59" class="u59_container"   data-label="title">
+<div id="u59_img" class="u59_normal detectCanvas"></div>
+<div id="u60" class="u60"  >
+<div id="u60_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#999999;">Title text</span></p></div>
+</div>
+</div>
+<div id="u61" data-label="fg" ></div>
+<DIV id="u62" style="" data-label="dp-reset">
+<DIV id="pd0u62" style="" data-label="_">
+<div id="u63" class="u63_container"   data-label="reset">
+<div id="u63_img" class="u63_normal detectCanvas"></div>
+<div id="u64" class="u64"  >
+<div id="u64_rtf"><p style="text-align:center;line-height:11px;"><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#666666;">Clear</span></p></div>
+</div>
+</div>
+</DIV>
+</DIV>
+<DIV id="u65" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:35px; top:534px; width:545px; height:125px;;" data-label="cont-3"></div>
+<div id="u66" class="u66_container"   data-label="bg">
+<div id="u66_img" class="u66_normal detectCanvas"></div>
+<div id="u67" class="u67" style="visibility:hidden;"  >
+<div id="u67_rtf"></div>
+</div>
+</div>
+<div id="u68" class="u68"  >
+<div id="u68_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">Selected option</span><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">:</span></p></div>
+</div>
+<div id="u69" class="u69"  data-label="option">
+<div id="u69_rtf"><p style="text-align:left;line-height:22px;"><span style="font-family:Tahoma;font-size:16px;font-weight:normal;font-style:normal;text-decoration:none;color:#CCCCCC;">Option not set. </span></p><p style="text-align:left;line-height:22px;"><span style="font-family:Tahoma;font-size:16px;font-weight:normal;font-style:normal;text-decoration:none;color:#CCCCCC;">Activate container and choose one of the options on the left.</span></p></div>
+</div>
+<div id="u70" class="u70_container"   data-label="title">
+<div id="u70_img" class="u70_normal detectCanvas"></div>
+<div id="u71" class="u71"  >
+<div id="u71_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#999999;">Title text</span></p></div>
+</div>
+</div>
+<div id="u72" data-label="fg" ></div>
+<DIV id="u73" style="" data-label="dp-reset">
+<DIV id="pd0u73" style="" data-label="_">
+<div id="u74" class="u74_container"   data-label="reset">
+<div id="u74_img" class="u74_normal detectCanvas"></div>
+<div id="u75" class="u75"  >
+<div id="u75_rtf"><p style="text-align:center;line-height:11px;"><span style="font-family:Tahoma;font-size:11px;font-weight:normal;font-style:normal;text-decoration:none;color:#666666;">Clear</span></p></div>
+</div>
+</div>
+</DIV>
+</DIV>
+<DIV id="u76" style="border-style:dotted; border-color:red; visibility:hidden; position:absolute; left:35px; top:669px; width:545px; height:125px;;" data-label="cont-4"></div>
+<TEXTAREA id=u77  class="u77" data-label="container-titles"   >Lorem ipsum dolor sit amet enim
+Etiam ullamcorper
+Suspendisse a pellentesque dui, non felis
+Maecenas malesuada elit lectus felis, malesuada ultricies</TEXTAREA>
+
+<div id="u78" class="u78"  >
+<div id="u78_rtf"><p style="text-align:left;"><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">Container titles</span></p></div>
+</div>
+<TEXTAREA id=u79  class="u79" data-label="option-values"   >Curabitur et ligula
+Ut molestie a, ultricies porta urna
+Vestibulum commodo volutpat
+Phasellus fermentum in, dolor
+Pellentesque facilisis
+Nulla imperdiet sit amet magna</TEXTAREA>
+
+<div id="u80" class="u80"  >
+<div id="u80_rtf"><p style="text-align:left;"><span style="font-family:Arial;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">Option values</span></p></div>
+</div>
+<div id="u81" class="u81"  >
+<div id="u81_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:13px;font-weight:bold;font-style:normal;text-decoration:none;color:#333333;">Available options </span><span style="font-family:Tahoma;font-size:13px;font-weight:normal;font-style:normal;text-decoration:none;color:#333333;">(click to apply)</span></p></div>
+</div>
+<div id="u82" class="u82"  >
+<div id="u82_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:28px;font-weight:normal;font-style:normal;text-decoration:none;color:#666666;">S</span><span style="font-family:Tahoma;font-size:28px;font-weight:normal;font-style:normal;text-decoration:none;color:#666666;">tates feature example</span></p></div>
+</div>
+<div id="u83" class="u83"  >
+<div id="u83_rtf"><p style="text-align:left;"><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">Page Context that is available from every Context object comes with </span><span style="font-family:Tahoma;font-size:14px;font-weight:bold;font-style:normal;text-decoration:none;color:#666666;">states</span><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">&nbsp;</span><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">method</span><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">. </span></p><p style="text-align:left;"><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">You can define unlimited states with different key names, change them and apply for notifications on their changes.</span></p><p style="text-align:left;"><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">Example below uses states </span><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">to trigger </span><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">container activation</span><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;">,</span><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;"> options availability</span><span style="font-family:Tahoma;font-size:14px;font-weight:normal;font-style:normal;text-decoration:none;color:#999999;"> and option activation.</span></p></div>
+</div>
+</div>
+<div class="preload"><img src="option_container_files/bg_u0_selected.png" width="1" height="1"/><img src="option_container_files/bg_u0_normal.png" width="1" height="1"/><img src="option_container_files/title_u4_selected.png" width="1" height="1"/><img src="option_container_files/reset_u8_mouseOver.png" width="1" height="1"/><img src="axhoox_starter_inject_files/u5_normal.png" width="1" height="1"/><img src="axhoox_starter_inject_files/u7_normal.png" width="1" height="1"/><img src="option_button_files/option_u22_mouseOver.png" width="1" height="1"/><img src="option_button_files/option_u22_disabled.png" width="1" height="1"/><img src="option_button_files/option_u22_normal.png" width="1" height="1"/></div>
+</body>
+<script src="resources/scripts/axurerp_pagescript.js"></script>
+<script src="states_files/axurerp_pagespecificscript.js" charset="utf-8"></script>
