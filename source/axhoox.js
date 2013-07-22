@@ -1,8 +1,4 @@
-;(function($, $axure, makeSandbox) {
-    
-    //debugger;
-    
-    //console.log('Starting...');
+;(function($, $axure, console, makeSandbox) {
     
     // constants
     
@@ -45,10 +41,7 @@
     
     // context objects prototypes
     
-    var _defaultContext = Object.create(Context.prototype, {/*
-    	constructor	: {
-    		value		: Context,
-    	},*/
+    var _defaultContext = Object.create(Context.prototype, {
 		init		: {
 			value		: function() {return this;},
 			writable	: true
@@ -1167,7 +1160,23 @@
     	_init();
     }
     
-})(jQuery, $axure, function() {
-	this.scr += '\n//@ sourceURL=' + window.location.href.match(/(\S+\/)\S+$/)[1] + '__axhoox/' + this.name + '.js\n';
-	return eval(this.scr);
-});
+})(
+	jQuery, 
+	$axure,
+	// console
+	(function() {
+		function noop() {};
+		var con = console || {};
+		['log', 'warn', 'time', 'timeEnd', 'dir', 'dirxml', 'profile', 'profileEnd'].forEach(function(p) {
+			if (typeof(con[p]) !== 'function') {
+				con[p] = noop;
+			}
+		});
+		return con;
+	})(),
+	// sandboxing 
+	function() {
+		this.scr += '\n//@ sourceURL=' + window.location.href.match(/(\S+\/)\S+$/)[1] + '__axhoox/' + this.name + '.js\n';
+		return eval(this.scr);
+	}
+);
