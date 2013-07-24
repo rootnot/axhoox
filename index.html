@@ -20,9 +20,9 @@
   <body>
       <div id="header">
         <nav>
-          <li class="fork"><a href="https://github.com/rootnot/axhoox"  onclick="ga('send', 'event', 'project-page', 'launch', 'project-page-link');" >View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/rootnot/axhoox/archive/v0.2-alpha-4.zip" onclick="ga('send', 'event', 'code', 'download', 'zip');" >ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/rootnot/axhoox/archive/v0.2-alpha-4.tar.gz" onclick="ga('send', 'event', 'code', 'download', 'tar');" >TAR</a></li>
+          <li class="fork"><a href="https://github.com/rootnot/axhoox"  onclick="ga_001('send', 'event', 'project-page', 'launch', 'project-page-link');ga_002('send', 'event', 'project-page', 'launch', 'project-page-link');" >View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/rootnot/axhoox/archive/v0.2-alpha-4.zip" onclick="ga_001('send', 'event', 'code', 'download', 'zip');ga_002('send', 'event', 'code', 'download', 'zip');" >ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/rootnot/axhoox/archive/v0.2-alpha-4.tar.gz" onclick="ga_001('send', 'event', 'code', 'download', 'tar');ga_002('send', 'event', 'code', 'download', 'tar');" >TAR</a></li>
           <li class="title">DOWNLOADS</li>
         </nav>
       </div><!-- end header -->
@@ -34,7 +34,7 @@
           <h1>axhoox</h1>
           <p>Just program your Axure prototypes in Java Script !</p>
           <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/rootnot" onclick="ga('send', 'event', 'author-page', 'lounch', 'author-link');" >rootnot</a></span>
+          <span class="credits left">Project maintained by <a href="https://github.com/rootnot" onclick="ga_001('send', 'event', 'author-page', 'lounch', 'author-link');ga_002('send', 'event', 'author-page', 'lounch', 'author-link');" >rootnot</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
 
@@ -52,8 +52,8 @@
 
 	      <h3>Find out more</h3>
 	      <ul>
-		      <li><a href="demo/index.html" target="_blank" onclick="ga('send', 'event', 'demo', 'launch', 'demo-link');" >Play with demo</a></li>
-		      <li><a href="https://github.com/rootnot/axhoox/wiki"  onclick="ga('send', 'event', 'wiki', 'launch', 'wiki-link');" >Read The Wiki</a></li>
+		      <li><a href="demo/index.html" target="_blank" onclick="ga_001('send', 'event', 'demo', 'launch', 'demo-link');ga_002('send', 'event', 'demo', 'launch', 'demo-link');" >Play with demo</a></li>
+		      <li><a href="https://github.com/rootnot/axhoox/wiki"  onclick="ga_001('send', 'event', 'wiki', 'launch', 'wiki-link');ga_002('send', 'event', 'wiki', 'launch', 'wiki-link');" >Read The Wiki</a></li>
 	      </ul>
       </section>
 
@@ -63,10 +63,18 @@
 		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga_001');
 		
-		  ga('create', 'UA-6150534-2', 'rootnot.github.io');
-		  ga('send', 'pageview');
+		  ga_001('create', 'UA-6150534-2', 'rootnot.github.io');
+		  ga_001('send', 'pageview');
+
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga_002');
+		
+		  ga_002('create', 'UA-42701719-1', 'rootnot.github.io');
+		  ga_002('send', 'pageview');
     </script>
   </body>
 </html>
