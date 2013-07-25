@@ -850,7 +850,10 @@
 				scriptIdx++;
 
 				if (o.type === DYNAMIC_PANEL_TYPE) {
-					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
+					for (var j = o.diagrams.length - 1; j >= 0; j--) {
+						// traversing states from bottom to top
+						// to reflect real object placement in html
+						// I suppose. I wish ;)
 						traverseDiagramObject(o.diagrams[j], newPath);
 					}
 				} else if (o.type === BUTTON_SHAPE_TYPE || o.type === RICH_TEXT_PANEL_TYPE && o.objects) {
