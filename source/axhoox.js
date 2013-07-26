@@ -806,8 +806,8 @@
     function _traversePage() {
     	var scriptIdx = 0, unlabeledIdx = 0;
     	
-    	function traverseDiagramObject(diagramObject, path) {
-    		walkDiagramObjects(diagramObject.objects, path);
+    	function traverseDiagramObject(diagramObject, path, ownerIdx) {
+    		walkDiagramObjects(diagramObject.objects, path, ownerIdx);
     	}
     	
     	function warnNonLabeled(o, path) {
@@ -820,8 +820,8 @@
     		console.warn(txt);
     	}
     	
-    	function walkDiagramObjects(objects, path) {
-    		var o, mo, po, newPath, scriptId, ownerIdx = _rdoFnToPath.length - 1;
+    	function walkDiagramObjects(objects, path, ownerIdx) {
+    		var o, mo, po, newPath, scriptId;
     		for (var i = 0, li = objects.length; i < li; i++) {
     			o = objects[i];
     			if (o.isContained && o.type === RICH_TEXT_PANEL_TYPE && o.label.length === 0) {
@@ -834,7 +834,7 @@
 				newPath = path + '/' + o.label;
 				if (o.type === MASTER_REF_TYPE) {
 					_rdoFnToPath.push(newPath);
-					traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath);
+					traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath, _rdoFnToPath.length - 1);
     				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
 				} else {
     				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
@@ -854,15 +854,15 @@
 						// traversing states from bottom to top
 						// to reflect real object placement in html
 						// I suppose. I wish ;)
-						traverseDiagramObject(o.diagrams[j], newPath);
+						traverseDiagramObject(o.diagrams[j], newPath, ownerIdx);
 					}
 				} else if (o.type === BUTTON_SHAPE_TYPE || o.type === RICH_TEXT_PANEL_TYPE && o.objects) {
-					traverseDiagramObject(o, newPath);
+					traverseDiagramObject(o, newPath, ownerIdx);
 				}
     		}
     	}
     	
-    	traverseDiagramObject($axure.pageData.page.diagram, '');
+    	traverseDiagramObject($axure.pageData.page.diagram, '', -1);
     	
     }
 
