@@ -17,6 +17,20 @@ function rdo8OnSelectionChange(e) {
 
 }
 
+function rdo9AxHooxReady(e) {
+
+}
+
+function rdo9AxHooxPrepareMasterContext(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'var instanceCounter = 0;\nvar selectionCounter = 0;\n\nvar instances = [];\nvar togglers = [\'setNotSelected\', \'setSelected\'];\n\nfunction fireChangeEvent() {\n    // fire on first instance only\n    instances[0].fireEvent(\'OnSelectionChange\', selectionCounter);\n}\n\nfunction writeLabel() {\n    this.get(\'label\').setText(\'Instance number \' + this.instanceNumber);\n}\n\nfunction selectAll() {\n    instances.forEach(function(i) {\n        i.select(true);\n    });\n    fireChangeEvent();\n}\n\nfunction unSelectAll() {\n    instances.forEach(function(i) {\n        i.select(false);\n    });\n    fireChangeEvent();\n}\n\nfunction toggleAll() {\n    instances.forEach(function(i) {\n        i.select(!i.isSelected);\n    });\n    fireChangeEvent();\n}\n\nfunction diceAll() {\n    instances.forEach(function(i) {\n        i.select(Boolean(Math.round(Math.random())));\n    });\n    fireChangeEvent();\n}\n\nfunction select(s) {\n    this.get(\'label\')[togglers[s ? 1 : 0]]();\n    if (!this.isSelected && s) {\n        selectionCounter ++;\n    } else if (this.isSelected && !s) {\n        selectionCounter --;\n    }\n    this.isSelected = s;\n}\n\nfunction toggleSelection() {\n    this.select(!this.isSelected);\n    fireChangeEvent();\n}\n\nfunction getSelectedCount() {\n    return selectionCounter;\n}\n\nfunction getInstanceCount() {\n    return instanceCounter;\n}\n\nfunction init() {\n    this.isSelected = this.get(\'label\').isSelected();\n    this.instanceNumber = ++instanceCounter;\n    instances.push(this);\n    if (this.isSelected) {\n        selectionCounter ++;\n    }\n    this.writeLabel();\n}\n\n$.extend(masterContext, {\n    autostart : true,\n    init : init,\n    writeLabel : writeLabel,\n    toggleSelection : toggleSelection,\n    select : select,\n    getSelectedCount : getSelectedCount,\n    getInstanceCount : getInstanceCount,\n    selectAll : selectAll,\n    unSelectAll : unSelectAll,\n    toggleAll : toggleAll,\n    diceAll : diceAll\n});');
+
+}
+
+}
+
 function rdo3AxHooxReady(e) {
 
 }
@@ -35,39 +49,25 @@ function rdo34OnSelectionChange(e) {
 
 }
 
-function rdo35AxHooxReady(e) {
-
-}
-
-function rdo35AxHooxPrepareMasterContext(e) {
-
-if (true) {
-
-SetGlobalVariableValue('AXHOOX', 'var instanceCounter = 0;\nvar selectionCounter = 0;\n\nvar instances = [];\nvar togglers = [\'setNotSelected\', \'setSelected\'];\n\nfunction fireChangeEvent() {\n    // fire on first instance only\n    instances[0].fireEvent(\'OnSelectionChange\', selectionCounter);\n}\n\nfunction writeLabel() {\n    this.get(\'label\').setText(\'Instance number \' + this.instanceNumber);\n}\n\nfunction selectAll() {\n    instances.forEach(function(i) {\n        i.select(true);\n    });\n    fireChangeEvent();\n}\n\nfunction unSelectAll() {\n    instances.forEach(function(i) {\n        i.select(false);\n    });\n    fireChangeEvent();\n}\n\nfunction toggleAll() {\n    instances.forEach(function(i) {\n        i.select(!i.isSelected);\n    });\n    fireChangeEvent();\n}\n\nfunction diceAll() {\n    instances.forEach(function(i) {\n        i.select(Boolean(Math.round(Math.random())));\n    });\n    fireChangeEvent();\n}\n\nfunction select(s) {\n    this.get(\'label\')[togglers[s ? 1 : 0]]();\n    if (!this.isSelected && s) {\n        selectionCounter ++;\n    } else if (this.isSelected && !s) {\n        selectionCounter --;\n    }\n    this.isSelected = s;\n}\n\nfunction toggleSelection() {\n    this.select(!this.isSelected);\n    fireChangeEvent();\n}\n\nfunction getSelectedCount() {\n    return selectionCounter;\n}\n\nfunction getInstanceCount() {\n    return instanceCounter;\n}\n\nfunction init() {\n    this.isSelected = this.get(\'label\').isSelected();\n    this.instanceNumber = ++instanceCounter;\n    instances.push(this);\n    if (this.isSelected) {\n        selectionCounter ++;\n    }\n    this.writeLabel();\n}\n\n$.extend(masterContext, {\n    autostart : true,\n    init : init,\n    writeLabel : writeLabel,\n    toggleSelection : toggleSelection,\n    select : select,\n    getSelectedCount : getSelectedCount,\n    getInstanceCount : getInstanceCount,\n    selectAll : selectAll,\n    unSelectAll : unSelectAll,\n    toggleAll : toggleAll,\n    diceAll : diceAll\n});');
-
-}
-
-}
-
-function rdo37AxHooxReady(e) {
-
-}
-
-function rdo37AxHooxPrepareMasterContext(e) {
-
-if (true) {
-
-SetGlobalVariableValue('AXHOOX', 'var instanceCounter = 0;\nvar selectionCounter = 0;\n\nvar instances = [];\nvar togglers = [\'setNotSelected\', \'setSelected\'];\n\nfunction fireChangeEvent() {\n    // fire on first instance only\n    instances[0].fireEvent(\'OnSelectionChange\', selectionCounter);\n}\n\nfunction writeLabel() {\n    this.get(\'label\').setText(\'Instance number \' + this.instanceNumber);\n}\n\nfunction selectAll() {\n    instances.forEach(function(i) {\n        i.select(true);\n    });\n    fireChangeEvent();\n}\n\nfunction unSelectAll() {\n    instances.forEach(function(i) {\n        i.select(false);\n    });\n    fireChangeEvent();\n}\n\nfunction toggleAll() {\n    instances.forEach(function(i) {\n        i.select(!i.isSelected);\n    });\n    fireChangeEvent();\n}\n\nfunction diceAll() {\n    instances.forEach(function(i) {\n        i.select(Boolean(Math.round(Math.random())));\n    });\n    fireChangeEvent();\n}\n\nfunction select(s) {\n    this.get(\'label\')[togglers[s ? 1 : 0]]();\n    if (!this.isSelected && s) {\n        selectionCounter ++;\n    } else if (this.isSelected && !s) {\n        selectionCounter --;\n    }\n    this.isSelected = s;\n}\n\nfunction toggleSelection() {\n    this.select(!this.isSelected);\n    fireChangeEvent();\n}\n\nfunction getSelectedCount() {\n    return selectionCounter;\n}\n\nfunction getInstanceCount() {\n    return instanceCounter;\n}\n\nfunction init() {\n    this.isSelected = this.get(\'label\').isSelected();\n    this.instanceNumber = ++instanceCounter;\n    instances.push(this);\n    if (this.isSelected) {\n        selectionCounter ++;\n    }\n    this.writeLabel();\n}\n\n$.extend(masterContext, {\n    autostart : true,\n    init : init,\n    writeLabel : writeLabel,\n    toggleSelection : toggleSelection,\n    select : select,\n    getSelectedCount : getSelectedCount,\n    getInstanceCount : getInstanceCount,\n    selectAll : selectAll,\n    unSelectAll : unSelectAll,\n    toggleAll : toggleAll,\n    diceAll : diceAll\n});');
-
-}
-
-}
-
 function rdo33AxHooxReady(e) {
 
 }
 
 function rdo33AxHooxPrepareMasterContext(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'var instanceCounter = 0;\nvar selectionCounter = 0;\n\nvar instances = [];\nvar togglers = [\'setNotSelected\', \'setSelected\'];\n\nfunction fireChangeEvent() {\n    // fire on first instance only\n    instances[0].fireEvent(\'OnSelectionChange\', selectionCounter);\n}\n\nfunction writeLabel() {\n    this.get(\'label\').setText(\'Instance number \' + this.instanceNumber);\n}\n\nfunction selectAll() {\n    instances.forEach(function(i) {\n        i.select(true);\n    });\n    fireChangeEvent();\n}\n\nfunction unSelectAll() {\n    instances.forEach(function(i) {\n        i.select(false);\n    });\n    fireChangeEvent();\n}\n\nfunction toggleAll() {\n    instances.forEach(function(i) {\n        i.select(!i.isSelected);\n    });\n    fireChangeEvent();\n}\n\nfunction diceAll() {\n    instances.forEach(function(i) {\n        i.select(Boolean(Math.round(Math.random())));\n    });\n    fireChangeEvent();\n}\n\nfunction select(s) {\n    this.get(\'label\')[togglers[s ? 1 : 0]]();\n    if (!this.isSelected && s) {\n        selectionCounter ++;\n    } else if (this.isSelected && !s) {\n        selectionCounter --;\n    }\n    this.isSelected = s;\n}\n\nfunction toggleSelection() {\n    this.select(!this.isSelected);\n    fireChangeEvent();\n}\n\nfunction getSelectedCount() {\n    return selectionCounter;\n}\n\nfunction getInstanceCount() {\n    return instanceCounter;\n}\n\nfunction init() {\n    this.isSelected = this.get(\'label\').isSelected();\n    this.instanceNumber = ++instanceCounter;\n    instances.push(this);\n    if (this.isSelected) {\n        selectionCounter ++;\n    }\n    this.writeLabel();\n}\n\n$.extend(masterContext, {\n    autostart : true,\n    init : init,\n    writeLabel : writeLabel,\n    toggleSelection : toggleSelection,\n    select : select,\n    getSelectedCount : getSelectedCount,\n    getInstanceCount : getInstanceCount,\n    selectAll : selectAll,\n    unSelectAll : unSelectAll,\n    toggleAll : toggleAll,\n    diceAll : diceAll\n});');
+
+}
+
+}
+
+function rdo35AxHooxReady(e) {
+
+}
+
+function rdo35AxHooxPrepareMasterContext(e) {
 
 if (true) {
 
@@ -101,7 +101,7 @@ SetGlobalVariableValue('AXHOOX', 'var instanceCounter = 0;\nvar selectionCounter
 
 }
 
-function rdo28OnSelectionChange(e) {
+function rdo36OnSelectionChange(e) {
 
 }
 
@@ -127,17 +127,7 @@ rdo0AxHooxPrepareMasterContext(e);
 
 }
 
-function rdo9AxHooxReady(e) {
-
-}
-
-function rdo9AxHooxPrepareMasterContext(e) {
-
-if (true) {
-
-SetGlobalVariableValue('AXHOOX', 'var instanceCounter = 0;\nvar selectionCounter = 0;\n\nvar instances = [];\nvar togglers = [\'setNotSelected\', \'setSelected\'];\n\nfunction fireChangeEvent() {\n    // fire on first instance only\n    instances[0].fireEvent(\'OnSelectionChange\', selectionCounter);\n}\n\nfunction writeLabel() {\n    this.get(\'label\').setText(\'Instance number \' + this.instanceNumber);\n}\n\nfunction selectAll() {\n    instances.forEach(function(i) {\n        i.select(true);\n    });\n    fireChangeEvent();\n}\n\nfunction unSelectAll() {\n    instances.forEach(function(i) {\n        i.select(false);\n    });\n    fireChangeEvent();\n}\n\nfunction toggleAll() {\n    instances.forEach(function(i) {\n        i.select(!i.isSelected);\n    });\n    fireChangeEvent();\n}\n\nfunction diceAll() {\n    instances.forEach(function(i) {\n        i.select(Boolean(Math.round(Math.random())));\n    });\n    fireChangeEvent();\n}\n\nfunction select(s) {\n    this.get(\'label\')[togglers[s ? 1 : 0]]();\n    if (!this.isSelected && s) {\n        selectionCounter ++;\n    } else if (this.isSelected && !s) {\n        selectionCounter --;\n    }\n    this.isSelected = s;\n}\n\nfunction toggleSelection() {\n    this.select(!this.isSelected);\n    fireChangeEvent();\n}\n\nfunction getSelectedCount() {\n    return selectionCounter;\n}\n\nfunction getInstanceCount() {\n    return instanceCounter;\n}\n\nfunction init() {\n    this.isSelected = this.get(\'label\').isSelected();\n    this.instanceNumber = ++instanceCounter;\n    instances.push(this);\n    if (this.isSelected) {\n        selectionCounter ++;\n    }\n    this.writeLabel();\n}\n\n$.extend(masterContext, {\n    autostart : true,\n    init : init,\n    writeLabel : writeLabel,\n    toggleSelection : toggleSelection,\n    select : select,\n    getSelectedCount : getSelectedCount,\n    getInstanceCount : getInstanceCount,\n    selectAll : selectAll,\n    unSelectAll : unSelectAll,\n    toggleAll : toggleAll,\n    diceAll : diceAll\n});');
-
-}
+function rdo28OnSelectionChange(e) {
 
 }
 
@@ -217,7 +207,17 @@ SetGlobalVariableValue('AXHOOX', 'var instanceCounter = 0;\nvar selectionCounter
 
 }
 
-function rdo36OnSelectionChange(e) {
+function rdo37AxHooxReady(e) {
+
+}
+
+function rdo37AxHooxPrepareMasterContext(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'var instanceCounter = 0;\nvar selectionCounter = 0;\n\nvar instances = [];\nvar togglers = [\'setNotSelected\', \'setSelected\'];\n\nfunction fireChangeEvent() {\n    // fire on first instance only\n    instances[0].fireEvent(\'OnSelectionChange\', selectionCounter);\n}\n\nfunction writeLabel() {\n    this.get(\'label\').setText(\'Instance number \' + this.instanceNumber);\n}\n\nfunction selectAll() {\n    instances.forEach(function(i) {\n        i.select(true);\n    });\n    fireChangeEvent();\n}\n\nfunction unSelectAll() {\n    instances.forEach(function(i) {\n        i.select(false);\n    });\n    fireChangeEvent();\n}\n\nfunction toggleAll() {\n    instances.forEach(function(i) {\n        i.select(!i.isSelected);\n    });\n    fireChangeEvent();\n}\n\nfunction diceAll() {\n    instances.forEach(function(i) {\n        i.select(Boolean(Math.round(Math.random())));\n    });\n    fireChangeEvent();\n}\n\nfunction select(s) {\n    this.get(\'label\')[togglers[s ? 1 : 0]]();\n    if (!this.isSelected && s) {\n        selectionCounter ++;\n    } else if (this.isSelected && !s) {\n        selectionCounter --;\n    }\n    this.isSelected = s;\n}\n\nfunction toggleSelection() {\n    this.select(!this.isSelected);\n    fireChangeEvent();\n}\n\nfunction getSelectedCount() {\n    return selectionCounter;\n}\n\nfunction getInstanceCount() {\n    return instanceCounter;\n}\n\nfunction init() {\n    this.isSelected = this.get(\'label\').isSelected();\n    this.instanceNumber = ++instanceCounter;\n    instances.push(this);\n    if (this.isSelected) {\n        selectionCounter ++;\n    }\n    this.writeLabel();\n}\n\n$.extend(masterContext, {\n    autostart : true,\n    init : init,\n    writeLabel : writeLabel,\n    toggleSelection : toggleSelection,\n    select : select,\n    getSelectedCount : getSelectedCount,\n    getInstanceCount : getInstanceCount,\n    selectAll : selectAll,\n    unSelectAll : unSelectAll,\n    toggleAll : toggleAll,\n    diceAll : diceAll\n});');
+
+}
 
 }
 
@@ -396,6 +396,18 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
+document.getElementById('u68_img').tabIndex = 0;
+HookHover('u68', false);
+
+u68.style.cursor = 'pointer';
+$axure.eventManager.click('u68', function(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
+
+}
+});
 document.getElementById('u76_img').tabIndex = 0;
 HookHover('u76', false);
 
@@ -408,56 +420,15 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-gv_vAlignTable['u77'] = 'center';document.getElementById('u32_img').tabIndex = 0;
-HookHover('u32', false);
+document.getElementById('u48_img').tabIndex = 0;
+HookHover('u48', false);
 
-u32.style.cursor = 'pointer';
-$axure.eventManager.click('u32', function(e) {
+u48.style.cursor = 'pointer';
+$axure.eventManager.click('u48', function(e) {
 
 if (true) {
 
 SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
-
-}
-});
-gv_vAlignTable['u53'] = 'center';document.getElementById('u87_img').tabIndex = 0;
-HookHover('u87', false);
-
-u87.style.cursor = 'pointer';
-$axure.eventManager.click('u87', function(e) {
-
-if (true) {
-
-SetGlobalVariableValue('AXHOOX', 'scriptContext.page.onButtonClick(scriptContext.label);');
-
-}
-});
-document.getElementById('u4_img').tabIndex = 0;
-
-u4.style.cursor = 'pointer';
-$axure.eventManager.click('u4', function(e) {
-
-if (true) {
-
-	NewTab('http://rootnot.github.io/axhoox', "");
-
-}
-});
-
-$axure.eventManager.click('u7', function(e) {
-
-if (true) {
-
-SetGlobalVariableValue('AXHOOX', 'scriptContext.page.check();');
-
-}
-});
-
-$axure.eventManager.click('u7', function(e) {
-
-if (true) {
-
-SetGlobalVariableValue('AXHOOX', 'scriptContext.page.check();');
 
 }
 });
@@ -473,6 +444,36 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
+gv_vAlignTable['u53'] = 'center';document.getElementById('u85_img').tabIndex = 0;
+HookHover('u85', false);
+
+u85.style.cursor = 'pointer';
+$axure.eventManager.click('u85', function(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'scriptContext.page.onButtonClick(scriptContext.label);');
+
+}
+});
+
+$axure.eventManager.click('u7', function(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'scriptContext.page.check();');
+
+}
+});
+
+$axure.eventManager.click('u7', function(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'scriptContext.page.check();');
+
+}
+});
 document.getElementById('u60_img').tabIndex = 0;
 HookHover('u60', false);
 
@@ -485,7 +486,7 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-gv_vAlignTable['u89'] = 'top';gv_vAlignTable['u17'] = 'center';document.getElementById('u64_img').tabIndex = 0;
+gv_vAlignTable['u89'] = 'top';document.getElementById('u64_img').tabIndex = 0;
 HookHover('u64', false);
 
 u64.style.cursor = 'pointer';
@@ -509,18 +510,6 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.page.onButtonClick(scriptContext
 
 }
 });
-document.getElementById('u85_img').tabIndex = 0;
-HookHover('u85', false);
-
-u85.style.cursor = 'pointer';
-$axure.eventManager.click('u85', function(e) {
-
-if (true) {
-
-SetGlobalVariableValue('AXHOOX', 'scriptContext.page.onButtonClick(scriptContext.label);');
-
-}
-});
 
 $axure.eventManager.click('u11', function(e) {
 
@@ -530,7 +519,7 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.page.check();');
 
 }
 });
-gv_vAlignTable['u41'] = 'center';gv_vAlignTable['u45'] = 'center';document.getElementById('u36_img').tabIndex = 0;
+gv_vAlignTable['u41'] = 'center';gv_vAlignTable['u17'] = 'center';gv_vAlignTable['u45'] = 'center';document.getElementById('u36_img').tabIndex = 0;
 HookHover('u36', false);
 
 u36.style.cursor = 'pointer';
@@ -542,7 +531,19 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-gv_vAlignTable['u37'] = 'center';document.getElementById('u2_img').tabIndex = 0;
+document.getElementById('u87_img').tabIndex = 0;
+HookHover('u87', false);
+
+u87.style.cursor = 'pointer';
+$axure.eventManager.click('u87', function(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'scriptContext.page.onButtonClick(scriptContext.label);');
+
+}
+});
+document.getElementById('u2_img').tabIndex = 0;
 
 u2.style.cursor = 'pointer';
 $axure.eventManager.click('u2', function(e) {
@@ -565,7 +566,7 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.page.onButtonClick(scriptContext
 
 }
 });
-gv_vAlignTable['u13'] = 'center';document.getElementById('u52_img').tabIndex = 0;
+gv_vAlignTable['u57'] = 'center';gv_vAlignTable['u13'] = 'center';document.getElementById('u52_img').tabIndex = 0;
 HookHover('u52', false);
 
 u52.style.cursor = 'pointer';
@@ -577,35 +578,45 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-gv_vAlignTable['u3'] = 'center';document.getElementById('u68_img').tabIndex = 0;
-HookHover('u68', false);
-
-u68.style.cursor = 'pointer';
-$axure.eventManager.click('u68', function(e) {
+gv_vAlignTable['u3'] = 'center';
+$axure.eventManager.click('u6', function(e) {
 
 if (true) {
 
-SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
+	SetPanelState('u1', 'pd1u1','none','',500,'none','',500);
+
+rdo0AxHooxReady(e);
 
 }
 });
-gv_vAlignTable['u90'] = 'top';gv_vAlignTable['u73'] = 'center';gv_vAlignTable['u84'] = 'center';document.getElementById('u20_img').tabIndex = 0;
-HookHover('u20', false);
 
-u20.style.cursor = 'pointer';
-$axure.eventManager.click('u20', function(e) {
+$axure.eventManager.click('u6', function(e) {
 
 if (true) {
 
-SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
+	SetPanelState('u1', 'pd1u1','none','',500,'none','',500);
+
+rdo0AxHooxReady(e);
 
 }
 });
-document.getElementById('u28_img').tabIndex = 0;
+gv_vAlignTable['u77'] = 'center';gv_vAlignTable['u90'] = 'top';document.getElementById('u28_img').tabIndex = 0;
 HookHover('u28', false);
 
 u28.style.cursor = 'pointer';
 $axure.eventManager.click('u28', function(e) {
+
+if (true) {
+
+SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
+
+}
+});
+document.getElementById('u20_img').tabIndex = 0;
+HookHover('u20', false);
+
+u20.style.cursor = 'pointer';
+$axure.eventManager.click('u20', function(e) {
 
 if (true) {
 
@@ -625,29 +636,19 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-gv_vAlignTable['u69'] = 'center';
-$axure.eventManager.click('u6', function(e) {
+gv_vAlignTable['u69'] = 'center';gv_vAlignTable['u84'] = 'center';gv_vAlignTable['u61'] = 'center';document.getElementById('u32_img').tabIndex = 0;
+HookHover('u32', false);
+
+u32.style.cursor = 'pointer';
+$axure.eventManager.click('u32', function(e) {
 
 if (true) {
 
-	SetPanelState('u1', 'pd1u1','none','',500,'none','',500);
-
-rdo0AxHooxReady(e);
+SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-
-$axure.eventManager.click('u6', function(e) {
-
-if (true) {
-
-	SetPanelState('u1', 'pd1u1','none','',500,'none','',500);
-
-rdo0AxHooxReady(e);
-
-}
-});
-gv_vAlignTable['u61'] = 'center';gv_vAlignTable['u65'] = 'center';document.getElementById('u56_img').tabIndex = 0;
+gv_vAlignTable['u65'] = 'center';document.getElementById('u56_img').tabIndex = 0;
 HookHover('u56', false);
 
 u56.style.cursor = 'pointer';
@@ -659,7 +660,7 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-gv_vAlignTable['u82'] = 'center';gv_vAlignTable['u5'] = 'center';document.getElementById('u12_img').tabIndex = 0;
+gv_vAlignTable['u5'] = 'center';gv_vAlignTable['u82'] = 'center';document.getElementById('u12_img').tabIndex = 0;
 HookHover('u12', false);
 
 u12.style.cursor = 'pointer';
@@ -683,19 +684,7 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-document.getElementById('u48_img').tabIndex = 0;
-HookHover('u48', false);
-
-u48.style.cursor = 'pointer';
-$axure.eventManager.click('u48', function(e) {
-
-if (true) {
-
-SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
-
-}
-});
-gv_vAlignTable['u88'] = 'center';gv_vAlignTable['u57'] = 'center';document.getElementById('u40_img').tabIndex = 0;
+gv_vAlignTable['u37'] = 'center';gv_vAlignTable['u88'] = 'center';gv_vAlignTable['u80'] = 'top';document.getElementById('u40_img').tabIndex = 0;
 HookHover('u40', false);
 
 u40.style.cursor = 'pointer';
@@ -707,7 +696,7 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-document.getElementById('u44_img').tabIndex = 0;
+gv_vAlignTable['u73'] = 'center';document.getElementById('u44_img').tabIndex = 0;
 HookHover('u44', false);
 
 u44.style.cursor = 'pointer';
@@ -719,4 +708,14 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.getOwner().toggleSelection();');
 
 }
 });
-gv_vAlignTable['u29'] = 'center';gv_vAlignTable['u80'] = 'top';
+gv_vAlignTable['u29'] = 'center';document.getElementById('u4_img').tabIndex = 0;
+
+u4.style.cursor = 'pointer';
+$axure.eventManager.click('u4', function(e) {
+
+if (true) {
+
+	NewTab('http://rootnot.github.io/axhoox', "");
+
+}
+});

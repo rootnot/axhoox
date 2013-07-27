@@ -98,7 +98,7 @@ SetGlobalVariableValue('AXHOOX', GetWidgetText('u56'));
 }
 
 }
-gv_vAlignTable['u31'] = 'top';gv_vAlignTable['u36'] = 'top';
+gv_vAlignTable['u45'] = 'center';gv_vAlignTable['u27'] = 'center';
 $axure.eventManager.click('u16', function(e) {
 
 if (true) {
@@ -118,7 +118,7 @@ rdo5OnClick(e);
 
 }
 });
-gv_vAlignTable['u37'] = 'top';gv_vAlignTable['u29'] = 'center';document.getElementById('u8_img').tabIndex = 0;
+gv_vAlignTable['u29'] = 'center';document.getElementById('u8_img').tabIndex = 0;
 
 u8.style.cursor = 'pointer';
 $axure.eventManager.click('u8', function(e) {
@@ -151,7 +151,7 @@ rdo0AxHooxReady(e);
 
 }
 });
-gv_vAlignTable['u58'] = 'top';gv_vAlignTable['u59'] = 'top';gv_vAlignTable['u15'] = 'center';
+gv_vAlignTable['u58'] = 'top';gv_vAlignTable['u42'] = 'top';gv_vAlignTable['u47'] = 'center';gv_vAlignTable['u35'] = 'center';
 $axure.eventManager.click('u13', function(e) {
 
 if (true) {
@@ -171,7 +171,7 @@ rdo4OnClick(e);
 
 }
 });
-document.getElementById('u4_img').tabIndex = 0;
+gv_vAlignTable['u15'] = 'center';gv_vAlignTable['u36'] = 'top';gv_vAlignTable['u51'] = 'center';document.getElementById('u4_img').tabIndex = 0;
 
 u4.style.cursor = 'pointer';
 $axure.eventManager.click('u4', function(e) {
@@ -182,7 +182,7 @@ if (true) {
 
 }
 });
-gv_vAlignTable['u30'] = 'top';gv_vAlignTable['u43'] = 'top';gv_vAlignTable['u57'] = 'top';gv_vAlignTable['u41'] = 'center';
+gv_vAlignTable['u57'] = 'top';gv_vAlignTable['u30'] = 'top';
 $axure.eventManager.click('u10', function(e) {
 
 if (true) {
@@ -191,7 +191,7 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.get(\'bt\').setSelected().page.o
 
 }
 });
-document.getElementById('u11_img').tabIndex = 0;
+gv_vAlignTable['u43'] = 'top';document.getElementById('u11_img').tabIndex = 0;
 
 u11.style.cursor = 'pointer';
 $axure.eventManager.click('u11', function(e) {
@@ -202,7 +202,7 @@ rdo3OnClick(e);
 
 }
 });
-gv_vAlignTable['u3'] = 'center';gv_vAlignTable['u12'] = 'center';gv_vAlignTable['u39'] = 'center';gv_vAlignTable['u9'] = 'center';gv_vAlignTable['u27'] = 'center';gv_vAlignTable['u42'] = 'top';gv_vAlignTable['u24'] = 'center';gv_vAlignTable['u53'] = 'center';gv_vAlignTable['u54'] = 'top';gv_vAlignTable['u5'] = 'center';document.getElementById('u2_img').tabIndex = 0;
+gv_vAlignTable['u12'] = 'center';gv_vAlignTable['u39'] = 'center';gv_vAlignTable['u9'] = 'center';gv_vAlignTable['u3'] = 'center';gv_vAlignTable['u24'] = 'center';gv_vAlignTable['u53'] = 'center';gv_vAlignTable['u54'] = 'top';document.getElementById('u2_img').tabIndex = 0;
 
 u2.style.cursor = 'pointer';
 $axure.eventManager.click('u2', function(e) {
@@ -222,7 +222,7 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.get(\'bt\').setSelected().page.o
 
 }
 });
-gv_vAlignTable['u55'] = 'top';document.getElementById('u20_img').tabIndex = 0;
+document.getElementById('u20_img').tabIndex = 0;
 
 u20.style.cursor = 'pointer';
 $axure.eventManager.click('u20', function(e) {
@@ -233,7 +233,7 @@ rdo6OnClick(e);
 
 }
 });
-gv_vAlignTable['u21'] = 'center';gv_vAlignTable['u48'] = 'top';
+gv_vAlignTable['u41'] = 'center';gv_vAlignTable['u5'] = 'center';gv_vAlignTable['u48'] = 'top';
 $axure.eventManager.click('u22', function(e) {
 
 if (true) {
@@ -242,4 +242,4 @@ SetGlobalVariableValue('AXHOOX', 'scriptContext.get(\'bt\').setSelected().page.o
 
 }
 });
-gv_vAlignTable['u49'] = 'top';gv_vAlignTable['u47'] = 'center';gv_vAlignTable['u51'] = 'center';gv_vAlignTable['u45'] = 'center';gv_vAlignTable['u33'] = 'center';gv_vAlignTable['u35'] = 'center';
+gv_vAlignTable['u49'] = 'top';gv_vAlignTable['u37'] = 'top';gv_vAlignTable['u21'] = 'center';gv_vAlignTable['u59'] = 'top';gv_vAlignTable['u33'] = 'center';gv_vAlignTable['u31'] = 'top';gv_vAlignTable['u55'] = 'top';

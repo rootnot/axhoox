@@ -1,4 +1,4 @@
-@font-face {
+﻿@font-face {
 	font-family: 'hurra-icons';
 	src:url('fonts/hurra-icons.eot');
 	src:url('fonts/hurra-icons.eot?#iefix') format('embedded-opentype'),
@@ -8,28 +8,6 @@
 	font-weight: normal;
 	font-style: normal;
 }
-
-@font-face {
-    font-family: Tahoma;
-    font-weight: normal;
-    src: url('fonts/tahoma.eot');
-    src: url('fonts/tahoma.eot?#iefix') format('embedded-opentype'),
-         url('fonts/tahoma.woff') format('woff'),
-         url('fonts/tahoma.ttf') format('truetype'),
-         url('fonts/tahoma.svg#TahomaRegular') format('svg');
-}
-
-@font-face {
-    font-family: Tahoma;
-    font-weight: bold;
-    src: url('fonts/tahomabd.eot');
-    src: url('fonts/tahomabd.eot?#iefix') format('embedded-opentype'),
-         url('fonts/tahomabd.woff') format('woff'),
-         url('fonts/tahomabd.ttf') format('truetype'),
-         url('fonts/tahomabd.svg#TahomaBold') format('svg');
-}
-
-
 
 p 
 {

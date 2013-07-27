@@ -806,8 +806,8 @@
     function _traversePage() {
     	var scriptIdx = 0, unlabeledIdx = 0;
     	
-    	function traverseDiagramObject(diagramObject, path) {
-    		walkDiagramObjects(diagramObject.objects, path);
+    	function traverseDiagramObject(diagramObject, path, ownerIdx) {
+    		walkDiagramObjects(diagramObject.objects, path, ownerIdx);
     	}
     	
     	function warnNonLabeled(o, path) {
@@ -820,8 +820,8 @@
     		console.warn(txt);
     	}
     	
-    	function walkDiagramObjects(objects, path) {
-    		var o, mo, po, newPath, scriptId, ownerIdx = _rdoFnToPath.length - 1;
+    	function walkDiagramObjects(objects, path, ownerIdx) {
+    		var o, mo, po, newPath, scriptId;
     		for (var i = 0, li = objects.length; i < li; i++) {
     			o = objects[i];
     			if (o.isContained && o.type === RICH_TEXT_PANEL_TYPE && o.label.length === 0) {
@@ -834,7 +834,7 @@
 				newPath = path + '/' + o.label;
 				if (o.type === MASTER_REF_TYPE) {
 					_rdoFnToPath.push(newPath);
-					traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath);
+					traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath, _rdoFnToPath.length - 1);
     				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
 				} else {
     				scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
@@ -850,16 +850,19 @@
 				scriptIdx++;
 
 				if (o.type === DYNAMIC_PANEL_TYPE) {
-					for (var j = 0, lj = o.diagrams.length; j < lj; j++) {
-						traverseDiagramObject(o.diagrams[j], newPath);
+					for (var j = o.diagrams.length - 1; j >= 0; j--) {
+						// traversing states from bottom to top
+						// to reflect real object placement in html
+						// I suppose. I wish ;)
+						traverseDiagramObject(o.diagrams[j], newPath, ownerIdx);
 					}
 				} else if (o.type === BUTTON_SHAPE_TYPE || o.type === RICH_TEXT_PANEL_TYPE && o.objects) {
-					traverseDiagramObject(o, newPath);
+					traverseDiagramObject(o, newPath, ownerIdx);
 				}
     		}
     	}
     	
-    	traverseDiagramObject($axure.pageData.page.diagram, '');
+    	traverseDiagramObject($axure.pageData.page.diagram, '', -1);
     	
     }
 
@@ -882,10 +885,8 @@
 	        
 	        var r = RDO_RX.exec(k);
 	        var fnIdx, evName, domCtx;
-	        // console.log('Checking:' + k);
 	        if (r) {
 	            
-	            // console.log('Wrapping:' + k);
 	            _wrapRdoFn(parseInt(r[1]), r[2]);
 	            
 	        }
@@ -921,7 +922,7 @@
 				$axure.globalVariableProvider._setVariableValue.apply($axure.globalVariableProvider, arguments);
 				return false;
 			} else if (value === PACKAGE) {
-				console.log('Probably chrome local delayed message.');
+				console.warn('Probably chrome local delayed message.');
 				return false;
 			} else if (!_currentCallInfo.args) {
 				console.warn('Calling from unknown scope.');
@@ -1016,7 +1017,6 @@
 			
 			if (owner.hasOwnProperty('_axHooxMasterContext')) {
 				// already defined. nothing to do
-				// console.log('Master Context already set. Returning.');
 				return;
 			}
 			
@@ -1029,7 +1029,7 @@
 			scriptParams = 'prepareMasterContext, preparePageContext, eventName';
 		}
 		
-		console.time('PrepareMasterContext handler');
+		// console.time('PrepareMasterContext handler');
 		
 		var crc = CRC32(value);
 		
@@ -1043,7 +1043,7 @@
 			console.error(e);
 		}
 		
-		console.timeEnd('PrepareMasterContext handler');
+		// console.timeEnd('PrepareMasterContext handler');
 	}
 	
 	function _regularHandler(varname, value) {
@@ -1052,7 +1052,7 @@
 			return;
 		}
 		
-		console.time('Regular handler');
+		// console.time('Regular handler');
 		var args = _currentCallInfo.args ? _currentCallInfo.args.slice() : [];
 		args.unshift(_currentCallInfo.eventName);
 		args.unshift(_getContext(_currentCallInfo.path));
@@ -1067,14 +1067,13 @@
 		} catch (e) {
 			console.error(e.toString(), e.stack || '');
 		}
-		console.timeEnd('Regular handler');
+		// console.timeEnd('Regular handler');
 	}
 	
 	function _setHandler(handler, save) {
 		if (save === true) {
 			_savedSetVariableValueHandler = $axure.globalVariableProvider.setVariableValue;
 			$(window).on('beforeunload', function() {
-				console.log('Unregistering handler');
 				$axure.globalVariableProvider.setVariableValue = _savedSetVariableValueHandler;
 			});
 		}
@@ -1167,7 +1166,7 @@
 	(function() {
 		function noop() {};
 		var con = console || {};
-		['log', 'warn', 'time', 'timeEnd', 'dir', 'dirxml', 'profile', 'profileEnd'].forEach(function(p) {
+		['log', 'error', 'warn', 'time', 'timeEnd'].forEach(function(p) {
 			if (typeof(con[p]) !== 'function') {
 				con[p] = noop;
 			}

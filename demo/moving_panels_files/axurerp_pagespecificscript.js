@@ -48,7 +48,7 @@ rdo0AxHooxPrepareMasterContext(e);
 }
 
 }
-gv_vAlignTable['u3'] = 'center';gv_vAlignTable['u15'] = 'center';document.getElementById('u4_img').tabIndex = 0;
+gv_vAlignTable['u3'] = 'center';gv_vAlignTable['u13'] = 'center';document.getElementById('u4_img').tabIndex = 0;
 
 u4.style.cursor = 'pointer';
 $axure.eventManager.click('u4', function(e) {
@@ -71,7 +71,7 @@ SetGlobalVariableValue('AXHOOX', 'var orbit = scriptContext.page.get(\'orbit\');
 
 }
 });
-
+gv_vAlignTable['u15'] = 'center';
 $axure.eventManager.click('u6', function(e) {
 
 if (true) {
@@ -104,7 +104,7 @@ if (true) {
 
 }
 });
-gv_vAlignTable['u13'] = 'center';gv_vAlignTable['u18'] = 'top';
+gv_vAlignTable['u18'] = 'top';
 $axure.eventManager.click('u7', function(e) {
 
 if (true) {
