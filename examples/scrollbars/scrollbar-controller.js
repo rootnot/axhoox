@@ -169,7 +169,7 @@ function init() {
     this.data.maxScroll = 100;
 
     // debounce to gain better performance
-    this.onHandleDrag = debounce(onHandleDrag.bind(this), 200);
+    this.onHandleDrag = debounce(onHandleDrag.bind(this), 100);
  
    // provide visible API to owner
     _ownerApi.forEach(function(method) {
