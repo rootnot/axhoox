@@ -39,7 +39,6 @@ function debounce(fn, delay) {
 
 function activate() {
     if (!this.data.active) {
-        console.log('Scrollbar activation');
         this.data.active = true;
         this.data.bar.get('dp-main').setState('active', 'fade', '', 300, 'fade', '', 300);
     }
@@ -48,7 +47,6 @@ function activate() {
 
 function deactivate(force) {
     if (this.data.active || force) {
-        console.log('Scrollbar deactivation');
         this.data.active = false;
         this.data.bar.get('dp-main').setState('idle', 'fade', '', 300, 'fade', '', 300);
     }
@@ -97,7 +95,6 @@ function onHandleDrag() {
     var val = Math.round(pos / this.data.barMaxScroll * this.data.maxScroll);
     if (val !== this.data.scroll) {
     	
-        console.log('Handle drag : ' + val);
         this.data.scroll = val;
         if (this.data.content) {
             var moveByParams = [0, 0];
