@@ -1,6 +1,7 @@
 # ![axhoox](http://content.screencast.com/users/rootnot/folders/Default/media/112b6f5f-18ca-463b-b892-3a4708f16463/logo-200px.png)
 
 ### Just program your Axure prototypes in Java Script !
+```javascript
 
 		scriptContext.get("dynamic-panel-1").setNextState(true);
 
@@ -12,7 +13,7 @@
 		}
   
 		scriptContext.data.YourOwnVariable = 'This is important';
-		
+```		
 		
 ### Read more in [The Wiki](https://github.com/rootnot/axhoox/wiki) or play with [Demo](http://rootnot.github.io/axhoox/demo/index.html)
 
