@@ -13,7 +13,7 @@
 
 // constants
 // methods to attach to scrollbar
-var _ownerApi = ['attachContent', 'getScroll', 'onHandleHover', 'onHandleOut', 'onHandleDragStart', 'onHandleDragDrop'];
+var _ownerApi = ['activate', 'attachContent', 'getScroll', 'setScroll', 'onHandleHover', 'onHandleOut', 'onHandleDragStart', 'onHandleDrag', 'onHandleDragDrop', 'maxScroll', 'barMaxScroll'];
 // names of dimmensioning properties
 var _dimmensions = ['width', 'height', 'x', 'y'];
 // a time to wait after mouseouts before deactivation 
@@ -88,6 +88,28 @@ function onHandleDragStart() {
     this.data.handleDrag = true;
 }
 
+// private
+function _updateContentPosition() {
+    var coord = _dimmensions[this.data.barType + 2];
+    var moveByParams = [0, 0];
+    moveByParams[this.data.barType] = -this.data.scroll - this.data.content.getRect()[coord];
+    this.data.content.moveBy.apply(this.data.content, moveByParams);
+}
+
+function _updateHandlePosition() {
+    var coord = _dimmensions[this.data.barType + 2];
+    var h = this.data.bar.get('dp-main/handle-idle');
+	var currentHandlePos = h.getRect()[coord];
+	var newHandlePos = this.data.scroll * this.data.barMaxScroll / this.data.maxScroll;
+	var moveByParams = [0, 0];
+	moveByParams[this.data.barType] = newHandlePos - currentHandlePos;
+	// apply translation to handle
+	h.moveBy.apply(h, moveByParams);
+	// and the same to an invisible active handle
+	h = this.data.bar.get('dp-main/handle-active');
+	h.moveBy.apply(h, moveByParams);
+}
+
 function onHandleDrag() {
     var coord = _dimmensions[this.data.barType + 2];
     var pos = this.data.bar.get('dp-main/handle-active').getRect()[coord];
@@ -97,11 +119,8 @@ function onHandleDrag() {
     	
         this.data.scroll = val;
         if (this.data.content) {
-            var moveByParams = [0, 0];
-            moveByParams[this.data.barType] = val - this.data.content.getRect()[coord];
-            this.data.content.moveBy.apply(this.data.content, moveByParams);
+	        _updateContentPosition.bind(this)();
         }
-
         this.data.bar.fireEvent('OnChange', val);
     }
 }
@@ -136,11 +155,26 @@ function attachContent(cnt) {
     }
     this.data.content = cnt;
     var dim = _dimmensions[this.data.barType];
-    this.data.maxScroll = cnt.getParent().getRect()[dim] - cnt.getRect()[dim];
+    this.data.maxScroll = cnt.getRect()[dim] - cnt.getParent().getRect()[dim];
 }
 
 function getScroll() {
     return this.data.scroll || 0;
+}
+
+function setScroll(v, triggerEvents) {
+	v = Math.min(this.data.maxScroll, Math.max(0, v));
+	if (v === this.data.scroll) {
+		return;
+	}
+	this.data.scroll = v;
+	_updateHandlePosition.bind(this)();
+    if (this.data.content) {
+        _updateContentPosition.bind(this)();
+    }
+    if (triggerEvents === true) {
+        this.data.bar.fireEvent('OnChange', this.data.scroll);
+    }
 }
 
 function init() {
@@ -169,8 +203,23 @@ function init() {
     this.onHandleDrag = debounce(onHandleDrag.bind(this), 100);
  
    // provide visible API to owner
-    _ownerApi.forEach(function(method) {
-        bar[method] = this[method].bind(this);
+    _ownerApi.forEach(function(prop) {
+    	var p = this[prop];
+    	if (typeof(p) === 'function') {
+    		// a method
+    		bar[prop] = p.bind(this);
+    	} else {
+    		// a data property
+    		var _selfData = this.data;
+    		Object.defineProperty(bar.data, prop, {
+    			get : function() {
+    				return _selfData[prop];
+    			},
+    			set : function(v) {
+    				_selfData[prop] = v;
+    			}
+    		});
+    	}
     }, this);
 
     // enable control
@@ -195,6 +244,7 @@ $.extend(masterContext, {
     onHandleDragDrop : onHandleDragDrop,
     attachContent : attachContent,
     getScroll : getScroll,
+    setScroll : setScroll,
     init : init
 
 });
