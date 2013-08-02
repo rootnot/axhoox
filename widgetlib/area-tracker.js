@@ -147,12 +147,6 @@ var api = {
 	removeTrack : removeTrack
 };
 
-// this is tricky. checking for masterContext presence generates reference error
-// when the var is not in any reachable scope
-// and there's now other than try/catch or this way to check 
-
-var masterContext = arguments[0];
-
 if (typeof masterContext === 'object') {
 	$.extend(masterContext, api);
 } else {
