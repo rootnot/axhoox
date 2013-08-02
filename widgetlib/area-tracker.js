@@ -1,13 +1,26 @@
 /**
- * Area tracker keeps information about mouse movements
+ * Area Tracker keeps information about mouse movements
  * over widgets provided for tracking.
- * Every time when mouse enters or lives tracking widget
- * the OnMouseEnter or OnMouseOut event is fired
+ * 
+ * Many widgets can be added to a single instance
+ * of Area tracker, then mouse actions OnMouseEnter and OnMouseOut 
+ * on any of them will trigger corresponding events on it.
+ * 
+ * Widgets added for tracking do not have to be
+ * in the foreground so you can create invisible areas  
+ * not influencing with other widgets of prototype.
+ * 
+ * 50 miliseconds of mouse inactivity should occur to propagate
+ * mouse over / mouse out change on an Area Tracker for a group 
+ * of tracking widgets. 
+ * 
+ * Non rectangle shapes are treated as rectangles with areas
+ * corresponding to their bounds.
  */
 
 // constants
-var MASTER_NAME = 'axx:area-tracker';
-var CHECK_INTERVAL = 500; 
+var MASTER_DEFAULT_NAME = 'axx:area-tracker';
+var CHECK_INTERVAL = 50; 
 var EVENTS = ['OnMouseOut', 'OnMouseEnter'];
 
 // runtime
@@ -66,6 +79,7 @@ TrackArea.prototype = {
 // class methods
 
 function mouseTracker(e) {
+	// console.log('mouseTracker');
 	clearTimeout(checkId);
 	mouseChange = mouseChange || (mouseX !== e.pageX) || (mouseY !== e.pageY);
 	mouseX = e.pageX;
@@ -77,7 +91,7 @@ function areaCheck() {
 	if (!mouseChange) {
 		return;
 	}
-	mouseChange = false;
+	stopTrack();
 	var id, i;
 	
 	for (id in areas) {
@@ -89,17 +103,18 @@ function areaCheck() {
 		delete changedInstances[id];
 		i.instance.fireEvent([EVENTS[Number(i.hovered)]]);	
 	}
-	
+	mouseChange = false;
+	startTrack();
 }
 
-function startCheck() {
+function startTrack() {
 	// checkId = setInterval(areaCheck, CHECK_INTERVAL);
-	$(document.body).on('mousemove', mouseTracker);
+	$(window).on('mousemove', mouseTracker);
 }
 
-function stopCheck() {
+function stopTrack() {
 	// clearInterval(checkId);
-	$(document.body).off('mousemove', mouseTracker);
+	$(window).off('mousemove', mouseTracker);
 }
 
 // instance methods
@@ -107,7 +122,7 @@ function stopCheck() {
 function addTrack(widget) {
 	
 	if (!areas.length) {
-		startCheck();
+		startTrack();
 	}
 	
 	if (!areas[widget.scriptId]) {
@@ -122,7 +137,7 @@ function removeTrack(widget) {
 	if (areas[widget.scriptId]) {
 		areas[widget.scriptId].removeInstance(this);
 		if (!areas.length) {
-			stopCheck();
+			stopTrack();
 		}
 	}
 }
@@ -132,12 +147,15 @@ var api = {
 	removeTrack : removeTrack
 };
 
+// this is tricky. checking for masterContext presence generates reference error
+// when the var is not in any reachable scope
+// and there's now other than try/catch or this way to check 
 
-if (prepareMasterContext === arguments[0]) {
-	// this is tricky. checking for masterContext presence generates reference error
-	// when the var is not in any reachable scope
-	// and there's now other than try catch way to check 
-	prepareMasterContext(MASTER_NAME, api);
-} else {
+var masterContext = arguments[0];
+
+if (typeof masterContext === 'object') {
 	$.extend(masterContext, api);
+} else {
+	prepareMasterContext(MASTER_DEFAULT_NAME, api);
 }
+
