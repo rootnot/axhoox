@@ -4,7 +4,7 @@
     
     var PACKAGE = 'AXHOOX';
     
-    var USER_SCRIPT_NAME_PREFIX = PACKAGE.toLowerCase();
+    var USER_SCRIPT_NAME_PREFIX = PACKAGE.toLowerCase() + '_';
     
     // object types corresponding to Axure scheme
     var MASTER_REF_TYPE = 'referenceDiagramObject', // master reference
@@ -1013,37 +1013,31 @@
 		
 		owner = scriptId instanceof Context ? $axure.pageData.page : $axure.pageData.scriptIdToObject[scriptId].owner;
 		
+
 		if (owner.type === 'Axure:Master') {
-			
 			if (owner.hasOwnProperty('_axHooxMasterContext')) {
 				// already defined. nothing to do
 				return;
 			}
-			
 			owner._axHooxMasterContext = masterContext =  Object.create(_getApiPrototype(MASTER_REF_TYPE));
-			
-			args.splice(0, 0, masterContext, prepareMasterContext, preparePageContext, _currentCallInfo.eventName);
-			scriptParams = 'masterContext, prepareMasterContext, preparePageContext, eventName';
-		} else {
-			args.splice(0, 0, prepareMasterContext, preparePageContext, _currentCallInfo.eventName);
-			scriptParams = 'prepareMasterContext, preparePageContext, eventName';
 		}
+
+		args.splice(0, 0, masterContext, prepareMasterContext, preparePageContext, _currentCallInfo.eventName);
+		scriptParams = 'masterContext, prepareMasterContext, preparePageContext, eventName';
 		
-		// console.time('PrepareMasterContext handler');
-		
+		var ord = ((Object.keys(_scripts).length + 1) / 1000).toFixed(3).slice(-3);
 		var crc = CRC32(value);
 		
 		try {
 			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox.call({
 					scr : "(function usr_fn" + crc + "(" + scriptParams + ") {\n" + value + "\n});",
-					name : USER_SCRIPT_NAME_PREFIX + crc
+					name : USER_SCRIPT_NAME_PREFIX + ord
 				}));
 			fn.apply(null, args);
 		} catch (e) {
 			console.error(e);
 		}
 		
-		// console.timeEnd('PrepareMasterContext handler');
 	}
 	
 	function _regularHandler(varname, value) {
@@ -1052,22 +1046,21 @@
 			return;
 		}
 		
-		// console.time('Regular handler');
 		var args = _currentCallInfo.args ? _currentCallInfo.args.slice() : [];
 		args.unshift(_currentCallInfo.eventName);
 		args.unshift(_getContext(_currentCallInfo.path));
 		
+		var ord = ((Object.keys(_scripts).length + 1) / 1000).toFixed(3).slice(-3);
 		var crc = CRC32(value);
 		try {
 			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox.call({
 					scr : "(function usr_fn" + crc + "(scriptContext, eventName) {\n" + value + "\n});",
-					name : USER_SCRIPT_NAME_PREFIX + crc
+					name : USER_SCRIPT_NAME_PREFIX + ord
 				}));
 			fn.apply(null, args);
 		} catch (e) {
 			console.error(e.toString(), e.stack || '');
 		}
-		// console.timeEnd('Regular handler');
 	}
 	
 	function _setHandler(handler, save) {
