@@ -18,8 +18,18 @@
  * corresponding to their bounds.
  */
 
-// constants
+
+// widget info
 var MASTER_DEFAULT_NAME = 'axx:area-tracker';
+
+var API = {
+    addTrack : addTrack,
+    removeTrack : removeTrack
+}
+
+masterContext && $.extend(masterContext, API) || prepareMasterContext(MASTER_DEFAULT_NAME, API);
+
+// constants
 var CHECK_INTERVAL = 50; 
 var EVENTS = ['OnMouseOut', 'OnMouseEnter'];
 
@@ -61,10 +71,19 @@ TrackArea.prototype = {
 		}
 	},
 	addInstance : function(instance) {
+	    var _self = this;
 		this.instances[instance.scriptId] = instance;
+		Object.defineProperty(instance.data, 'areaTrackerHovered', {
+		    get : function () {
+		        return _self.hovered;
+		    },
+		    configurable : true,
+		    writable : false
+		});
 	},
 	removeInstance : function(instance) {
 		if (this.instances[instance.scriptId]) {
+		    delete this.instances[instance.scriptId].data.areaTrackerHovered;
 			delete this.instances[instance.scriptId];
 		}
 		if (!this.instances.length) {
@@ -140,16 +159,5 @@ function removeTrack(widget) {
 			stopTrack();
 		}
 	}
-}
-
-var api = {
-	addTrack : addTrack,
-	removeTrack : removeTrack
-};
-
-if (typeof masterContext === 'object') {
-	$.extend(masterContext, api);
-} else {
-	prepareMasterContext(MASTER_DEFAULT_NAME, api);
 }
 
