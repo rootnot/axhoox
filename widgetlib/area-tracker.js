@@ -18,8 +18,21 @@
  * corresponding to their bounds.
  */
 
-// constants
+
+// widget info
 var MASTER_DEFAULT_NAME = 'axx:area-tracker';
+
+var API = {
+    addTrack : addTrack,
+    removeTrack : removeTrack,
+    getTracks : getTracks,
+    popTrack : popTrack,
+    init : init
+}
+
+masterContext && $.extend(masterContext, API) || prepareMasterContext(MASTER_DEFAULT_NAME, API);
+
+// constants
 var CHECK_INTERVAL = 50; 
 var EVENTS = ['OnMouseOut', 'OnMouseEnter'];
 
@@ -101,6 +114,7 @@ function areaCheck() {
 	for (id in changedInstances) {
 		i = changedInstances[id];
 		delete changedInstances[id];
+		i.instance.data.hovered = i.hovered;
 		i.instance.fireEvent([EVENTS[Number(i.hovered)]]);	
 	}
 	mouseChange = false;
@@ -120,6 +134,12 @@ function stopTrack() {
 // instance methods
 
 function addTrack(widget) {
+    
+    if (this.data.tracks.indexOf(widget.path) !== -1) {
+        return;
+    }
+    
+    this.data.tracks.push(widget.path);
 	
 	if (!areas.length) {
 		startTrack();
@@ -130,26 +150,51 @@ function addTrack(widget) {
 	}
 	
 	areas[widget.scriptId].addInstance(this);
+	return this;
 	
 }
 
-function removeTrack(widget) {
+function removeTrack(widget, force) {
+    
+    var tidx = this.data.tracks.indexOf(widget.path);
+    
+    if (tidx === -1 && force !== true) {
+        return;
+    } else if (tidx !== -1) {
+        this.data.tracks.splice(tidx, 1);
+    }
+    
 	if (areas[widget.scriptId]) {
 		areas[widget.scriptId].removeInstance(this);
 		if (!areas.length) {
 			stopTrack();
 		}
 	}
+	return this;
 }
 
-var api = {
-	addTrack : addTrack,
-	removeTrack : removeTrack
-};
+function getTracks() {
+    return this.data.tracks.slice();
+}
 
-if (typeof masterContext === 'object') {
-	$.extend(masterContext, api);
-} else {
-	prepareMasterContext(MASTER_DEFAULT_NAME, api);
+function popTrack() {
+    if (this.data.tracks.length) {
+        this.removeTrack(this.get(this.data.tracks.pop()), true);
+    }
+    return this;
+}
+
+function init() {
+    this.data.tracks = [];
+    Object.defineProperty(this, 'trackcount', {
+        get : function() {
+            return this.data.tracks.length;
+        }
+    });
+    Object.defineProperty(this, 'trackedAreasHovered', {
+        get : function () {
+            return this.data.hovered;
+        }
+    });
 }
 

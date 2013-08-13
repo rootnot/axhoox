@@ -11,9 +11,32 @@
  * 
  **/ 
 
-// constants
+var MASTER_DEFAULT_NAME = 'axx:scrollbar-controller';
+
 // methods to attach to scrollbar
-var _ownerApi = ['activate', 'attachContent', 'getScroll', 'setScroll', 'onHandleHover', 'onHandleOut', 'onHandleDragStart', 'onHandleDrag', 'onHandleDragDrop', 'maxScroll', 'barMaxScroll'];
+var OWNER_API_NAMES = ['activate', 'enable', 'disable', 'attachContent', 'getScroll', 'setScroll', 'onHandleHover', 'onHandleOut', 'onHandleDragStart', 'onHandleDrag', 'onHandleDragDrop', 'maxScroll', 'barMaxScroll'];
+
+var API = {
+    autostart : true,
+    activate : activate,
+    deactivate : deactivate,
+    enable : enable,
+    disable : disable,
+    delayedDeactivation : delayedDeactivation,
+    cancelDelayedDeactivation : cancelDelayedDeactivation,
+    onHandleHover : onHandleHover,
+    onHandleOut : onHandleOut,
+    onHandleDragStart : onHandleDragStart,
+    onHandleDragDrop : onHandleDragDrop,
+    attachContent : attachContent,
+    getScroll : getScroll,
+    setScroll : setScroll,
+    init : init
+}
+
+masterContext && $.extend(masterContext, API) || prepareMasterContext(MASTER_DEFAULT_NAME, API);
+
+// constants
 // names of dimmensioning properties
 var _dimmensions = ['width', 'height', 'x', 'y'];
 // a time to wait after mouseouts before deactivation 
@@ -51,6 +74,14 @@ function deactivate(force) {
         this.data.bar.get('dp-main').setState('idle', 'fade', '', 300, 'fade', '', 300);
     }
     return this;
+}
+
+function enable() {
+    this.data.bar.get('dp-main/bs-activator').enable();
+}
+
+function disable() {
+    this.data.bar.get('dp-main/bs-activator').disable();
 }
 
 function delayedDeactivation() {
@@ -203,7 +234,7 @@ function init() {
     this.onHandleDrag = debounce(onHandleDrag.bind(this), 100);
  
    // provide visible API to owner
-    _ownerApi.forEach(function(prop) {
+    OWNER_API_NAMES.forEach(function(prop) {
     	var p = this[prop];
     	if (typeof(p) === 'function') {
     		// a method
@@ -223,28 +254,5 @@ function init() {
     }, this);
 
     // enable control
-    bar.get('dp-main/bs-activator').enable();
+    this.enable();
 }
-// depending on place where used
-// for a AxHooxPrepareMasterContext of axhoox-status
-// inside this master use:
-$.extend(masterContext, {
-// in every other case use:
-// prepareMasterContext('master-name', {
-// prepareMasterContext('axx:scrollbar-controller', {
-
-    autostart : true,
-    activate : activate,
-    deactivate : deactivate,
-    delayedDeactivation : delayedDeactivation,
-    cancelDelayedDeactivation : cancelDelayedDeactivation,
-    onHandleHover : onHandleHover,
-    onHandleOut : onHandleOut,
-    onHandleDragStart : onHandleDragStart,
-    onHandleDragDrop : onHandleDragDrop,
-    attachContent : attachContent,
-    getScroll : getScroll,
-    setScroll : setScroll,
-    init : init
-
-});
