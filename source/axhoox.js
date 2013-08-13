@@ -1026,12 +1026,14 @@
 		scriptParams = 'masterContext, prepareMasterContext, preparePageContext, eventName';
 		
 		var ord = ((Object.keys(_scripts).length + 1) / 1000).toFixed(3).slice(-3);
+		var shebang = value.match(/\/\/#AXHOOX=(\S+)$/m);
+		shebang = shebang && ('_' + shebang[1]) || '';
 		var crc = CRC32(value);
 		
 		try {
 			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox.call({
 					scr : "(function usr_fn" + crc + "(" + scriptParams + ") {\n" + value + "\n});",
-					name : USER_SCRIPT_NAME_PREFIX + ord
+					name : USER_SCRIPT_NAME_PREFIX + ord + shebang
 				}));
 			fn.apply(null, args);
 		} catch (e) {
@@ -1051,11 +1053,13 @@
 		args.unshift(_getContext(_currentCallInfo.path));
 		
 		var ord = ((Object.keys(_scripts).length + 1) / 1000).toFixed(3).slice(-3);
+		var shebang = value.match(/\/\/#AXHOOX=(\S+)$/m);
+		shebang = shebang && ('_' + shebang[1]) || '';
 		var crc = CRC32(value);
 		try {
 			var fn = _scripts[crc] || (_scripts[crc] = makeSandbox.call({
 					scr : "(function usr_fn" + crc + "(scriptContext, eventName) {\n" + value + "\n});",
-					name : USER_SCRIPT_NAME_PREFIX + ord
+					name : USER_SCRIPT_NAME_PREFIX + ord + shebang
 				}));
 			fn.apply(null, args);
 		} catch (e) {
