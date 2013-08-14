@@ -1,3 +1,4 @@
+//#AXHOOX=axx:scrollbar-controller
 /**
  * Universal scrollbar controller example.
  * 
