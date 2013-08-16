@@ -48,8 +48,9 @@
         'widgetIdToSwipeRightFunction'
     ],
 
-    // regexp for querying rdo##AAA type functions
+    // regexps for querying rdo##AAA type functions
     RDO_RX = /^rdo(\d+)(\D+)$/,
+    RDO_SPLIT_RX = /(rdo\d+\S+?(?=\,))/,
 
     // status master name BEWARE!!! it's RESERVED!!!
     STATUS_MASTER = 'axhoox-status',
@@ -144,7 +145,7 @@
     }
 
     // wrap an rdo function
-    function _wrapRdoFn(rdoIdx, eventName) {
+    function _wrapRdoFn(rxResult, rdoIdx, eventName) {
         var rdoName = 'rdo' + rdoIdx + eventName,
             fn = window[rdoName];
 
@@ -962,29 +963,14 @@
     // Hooking on to every Master's every possible custom event
     // Unfortunately we should check the whole window object.
     // Although master's magic numbers are no mystery to us any more
-    // but the event's function's full names have to be settled
-    // by this, simple but time consuming heuristic filtering
-    function _wrapRdoFunctionsA() {
-        Object.keys(window).forEach(function(k) {
-            if (!(window[k] instanceof Function)) {
-                return;
-            }
-            var r = RDO_RX.exec(k),
-                fnIdx, evName, domCtx;
-            if (r) {
-                _wrapRdoFn(parseInt(r[1], 10), r[2]);
-            }
-        });
-    }
-
-    // New version of _wrapRdoFunctions
-    // seems to be faster by 1/3
+    // but the event's function's full names have to be settled.
+    // Iterating through every window property separately is much
+    // more time consuming then picking needles from this whole hay
     function _wrapRdoFunctions() {
-        // maybe faster ...
-        var wNames = (String() + Object.keys(window)).split(/(rdo\d+\S+?(?=\,))/),
+        var wNames = ('' + Object.keys(window)).split(RDO_SPLIT_RX),
             i, l,
-            rx = /^rdo(\d+)(\D+)$/, r,
-            fName;
+            r,
+            fn, fName;
 
         l = wNames.length;
         i = 0;
@@ -992,19 +978,23 @@
         while (i < l) {
 
             fName = wNames[i];
+            fn = window[fName];
 
-            if (window[fName] instanceof Function && (r = rx.exec(fName)) !== null) {
-                _wrapRdoFn(parseInt(r[1], 10), r[2]);
+            if (fn instanceof Function && (r = RDO_RX.exec(fName)) !== null) {
+
+                window[fName] = _wrap(fn, {
+                    eventName   : r[2],
+                    path        : _rdoFnToPath[parseInt(r[1], 10)]
+                });
+
                 i += 2;
+
             } else {
                 i++;
             }
 
         }
     }
-
-
-
 
     // Wrap up already established handlers for events
     // of elementary elements
@@ -1258,9 +1248,7 @@
 
         // Prepare what should be prepared
         _traversePage();
-        console.profile('_wrapRdoFunctions');
         _wrapRdoFunctions();
-        console.profileEnd('_wrapRdoFunctions');
         _wrapEventHandlers();
         _wrapWidgetSpecialEventFunctions();
 
