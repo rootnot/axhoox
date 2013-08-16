@@ -1,13 +1,25 @@
-;(function($, $axure, console, makeSandbox) {
+;(function(PACKAGE, $, $axure, console, makeSandbox) {
+
+    if (!window.hasOwnProperty(PACKAGE)) {
+
+        window[PACKAGE] = {
+            init    : false
+        };
+
+    } else {
+
+        // We've already been here. Definetely there's more than one
+        // starter on page and it's nothing more, nothing less
+        // than a usual waste of time.
+        console.warn('Duplicated starter on page. Fix it please.');
+        return;
+    }
 
     var
 
     ////////////////////////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////////////////////////
-
-    // package name
-    PACKAGE = 'AXHOOX',
 
     // for debugging purposes
     USER_SCRIPT_NAME_PREFIX = PACKAGE.toLowerCase() + '_',
@@ -63,21 +75,10 @@
     API_MAP,
 
     // prototype of basic scriptContext
-    _defaultContext = Object.create(Context.prototype, {
-        init : {
-            value       : function() {return this;},
-            writable    : true
-        }
-    }),
+    _defaultContext,
 
     // prototype of masterContext
-    _defaultMasterContext = Object.create(_defaultContext, {
-        autostart : {
-            value       : false,
-            writable    : true
-        }
-    }),
-
+    _defaultMasterContext,
 
     ////////////////////////////////////////////////////////////////////////////////////
     // runtime vars
@@ -180,7 +181,7 @@
 
 
     ////////////////////////////////////////////////////////////////////////////////////
-    // Context API
+    // ScriptContext API
     ////////////////////////////////////////////////////////////////////////////////////
 
     // agnostics (low level)
@@ -198,7 +199,7 @@
                 initContext = $axure.pageData.masters[axObject.masterId]._axHooxMasterContext || initContext;
             }
             _pathToContext[path] = o = Object.create(initContext);
-            Context.call(o, path, scriptId, _scriptIdToOwnerIndex[scriptId]);
+            ScriptContext.call(o, path, scriptId, _scriptIdToOwnerIndex[scriptId]);
             delete _scriptIdToOwnerIndex[scriptId];
             return o;
         }
@@ -209,7 +210,7 @@
     // provide path ow owning object
     function _getOwnerPath(path) {
         var scriptId = _pathToContext[path], oidx;
-        if (scriptId instanceof Context) {
+        if (scriptId instanceof ScriptContext) {
             oidx = scriptId.ownerIdx;
         } else {
             oidx = _scriptIdToOwnerIndex[scriptId];
@@ -546,10 +547,82 @@
         _savedSetVariableValueHandler(varName, String(varValue));
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////
+    // Constructor
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    function ScriptContext(path, scriptId, ownerIndex) {
+
+        var _iAmPage = typeof(scriptId) === 'undefined';
+
+        Object.defineProperties(this, {
+            path : {
+                value : path,
+                writable: false,
+                enumerable: true
+            },
+            scriptId : {
+                value : scriptId,
+                writable : false,
+                enumerable: !_iAmPage
+            },
+            rdoIdx : {
+                value : this.type === MASTER_REF_TYPE ? _rdoFnToPath.indexOf(path) : undefined,
+                writable: false,
+                enumerable : false
+            },
+            ownerIdx : {
+                value : ownerIndex,
+                writable : false,
+                enumerable : false
+            },
+            data : {
+                value : {},
+                writable : false,
+                enumerable: true
+            },
+            label : {
+                value : !_iAmPage ? $axure.pageData.scriptIdToObject[scriptId].label : undefined,
+                writable : false,
+                enumerable: !_iAmPage
+            },
+            page : {
+                value : !_iAmPage ? _pathToContext['/'] : this,
+                writable : false,
+                enumerable: true
+            },
+            master : {
+                value : this.type === MASTER_REF_TYPE ?
+                    $axure.pageData.masters[$axure.pageData.scriptIdToObject[scriptId].masterId].name :
+                    undefined,
+                writable : false,
+                enumerable: this.type === MASTER_REF_TYPE
+            }
+        });
+
+        this.init();
+
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////
     // API mappings for a whole set
     ////////////////////////////////////////////////////////////////////////////////////
+
+    // base prototype
+    _defaultContext = Object.create(ScriptContext.prototype, {
+        init : {
+            value       : function() {return this;},
+            writable    : true
+        }
+    });
+
+    // mother of all masters
+    _defaultMasterContext = Object.create(_defaultContext, {
+        autostart : {
+            value       : false,
+            writable    : true
+        }
+    });
 
     API_MAP = {
         'referenceDiagramObject' : {
@@ -666,7 +739,7 @@
             i, li, j, lj,
             ref;
 
-        if (s instanceof Context) {
+        if (s instanceof ScriptContext) {
             return s;
         }
 
@@ -722,61 +795,6 @@
         s = API_MAP[type] = Object.create(p || _defaultContext, props);
 
         return s;
-
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    // Constructor
-    ////////////////////////////////////////////////////////////////////////////////////
-
-    function Context(path, scriptId, ownerIndex) {
-
-        var _iAmPage = typeof(scriptId) === 'undefined';
-
-        Object.defineProperties(this, {
-            path : {
-                value : path,
-                writable: false,
-                enumerable: true
-            },
-            scriptId : {
-                value : scriptId,
-                writable : false,
-                enumerable: !_iAmPage
-            },
-            rdoIdx : {
-                value : this.type === MASTER_REF_TYPE ? _rdoFnToPath.indexOf(path) : undefined,
-                writable: false,
-                enumerable : false
-            },
-            ownerIdx : {
-                value : ownerIndex,
-                writable : false,
-                enumerable : false
-            },
-            data : {
-                value : {},
-                writable : false,
-                enumerable: true
-            },
-            label : {
-                value : !_iAmPage ? $axure.pageData.scriptIdToObject[scriptId].label : undefined,
-                writable : false,
-                enumerable: !_iAmPage
-            },
-            page : {
-                value : !_iAmPage ? _pathToContext['/'] : this,
-                writable : false,
-                enumerable: true
-            },
-            master : {
-                value : this.type === MASTER_REF_TYPE ? $axure.pageData.masters[$axure.pageData.scriptIdToObject[scriptId].masterId].name : undefined,
-                writable : false,
-                enumerable: this.type === MASTER_REF_TYPE
-            }
-        });
-
-        this.init();
 
     }
 
@@ -934,7 +952,7 @@
     function _initPageContext() {
         var p = '/',
             po = _pathToContext[p] = Object.create($axure.pageData.page._axHooxPageContext || _getApiPrototype(PAGE_TYPE));
-        Context.call(po, p, undefined, -1);
+        ScriptContext.call(po, p, undefined, -1);
         _currentCallInfo = {
             eventName     : null,
             path        : p
@@ -946,7 +964,7 @@
     // Although master's magic numbers are no mystery to us any more
     // but the event's function's full names have to be settled
     // by this, simple but time consuming heuristic filtering
-    function _wrapRdoFunctions() {
+    function _wrapRdoFunctionsA() {
         Object.keys(window).forEach(function(k) {
             if (!(window[k] instanceof Function)) {
                 return;
@@ -958,6 +976,35 @@
             }
         });
     }
+
+    // New version of _wrapRdoFunctions
+    // seems to be faster by 1/3
+    function _wrapRdoFunctions() {
+        // maybe faster ...
+        var wNames = (String() + Object.keys(window)).split(/(rdo\d+\S+?(?=\,))/),
+            i, l,
+            rx = /^rdo(\d+)(\D+)$/, r,
+            fName;
+
+        l = wNames.length;
+        i = 0;
+
+        while (i < l) {
+
+            fName = wNames[i];
+
+            if (window[fName] instanceof Function && (r = rx.exec(fName)) !== null) {
+                _wrapRdoFn(parseInt(r[1], 10), r[2]);
+                i += 2;
+            } else {
+                i++;
+            }
+
+        }
+    }
+
+
+
 
     // Wrap up already established handlers for events
     // of elementary elements
@@ -1102,7 +1149,7 @@
 
         scriptId = _pathToContext[_currentCallInfo.path];
 
-        owner = scriptId instanceof Context ? $axure.pageData.page : $axure.pageData.scriptIdToObject[scriptId].owner;
+        owner = scriptId instanceof ScriptContext ? $axure.pageData.page : $axure.pageData.scriptIdToObject[scriptId].owner;
 
 
         if (owner.type === 'Axure:Master') {
@@ -1195,14 +1242,6 @@
     // Let's roll!
     function _init() {
 
-        if (window.hasOwnProperty(PACKAGE)) {
-            return;
-        }
-
-        window[PACKAGE] = {
-            init    : false
-        };
-
         // Check if any of the variables will bring that magic key to us
         if (!$axure.globalVariableProvider.getDefinedVariables().some(function(v) {
             if ($axure.globalVariableProvider.getVariableValue(v) === PACKAGE) {
@@ -1219,7 +1258,9 @@
 
         // Prepare what should be prepared
         _traversePage();
+        console.profile('_wrapRdoFunctions');
         _wrapRdoFunctions();
+        console.profileEnd('_wrapRdoFunctions');
         _wrapEventHandlers();
         _wrapWidgetSpecialEventFunctions();
 
@@ -1244,7 +1285,9 @@
 
         // process instancess of masters with an autostart option
         $axure(function(o) {
-            return o.type === MASTER_REF_TYPE && $axure.pageData.masters[o.masterId]._axHooxMasterContext && $axure.pageData.masters[o.masterId]._axHooxMasterContext.autostart;
+            return o.type === MASTER_REF_TYPE &&
+                $axure.pageData.masters[o.masterId]._axHooxMasterContext &&
+                $axure.pageData.masters[o.masterId]._axHooxMasterContext.autostart;
         }).getIds().forEach(function(scriptId) {
             _getContext(_scriptIdToPath[scriptId]);
         });
@@ -1258,17 +1301,11 @@
         });
     }
 
-    if (!Object.hasOwnProperty(window, PACKAGE)) {
-        _init();
-    } else {
-        // we've already been here definetely more than one
-        // starter on page and it's nothing more, nothing less
-        // than a usual waste of time.
-        console.warn('Duplicated starter on page. Fix it please.');
-        return;
-    }
+    _init();
 
 }(
+    // package name
+    'AXHOOX',
     // dependencies, we need them
     jQuery,
     // pretty much
