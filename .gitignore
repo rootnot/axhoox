@@ -1,4 +1,6 @@
 generated-prototype/*
 !generated-prototype/__axhoox/
 generated-prototype/__axhoox/*
+source-maps/*
+!source-maps/
 !.preserve
