@@ -1,16 +1,16 @@
 //#AXHOOX=axx:scrollbar-controller
 /**
  * Universal scrollbar controller example.
- * 
+ *
  * Contents of this file should be attached
- * to AxHooxPrepareMasterContext event of 
+ * to AxHooxPrepareMasterContext event of
  * axhoox-status or axhoox starter masters
- * 
- * Controller instance when placed somewhere 
+ *
+ * Controller instance when placed somewhere
  * inside the controled scrollbar master examines
  * if it's horizontal or vertical scrollbar
- * 
- **/ 
+ *
+ **/
 
 var MASTER_DEFAULT_NAME = 'axx:scrollbar-controller';
 
@@ -33,14 +33,14 @@ var API = {
     getScroll : getScroll,
     setScroll : setScroll,
     init : init
-}
+};
 
 masterContext && $.extend(masterContext, API) || prepareMasterContext(MASTER_DEFAULT_NAME, API);
 
 // constants
 // names of dimmensioning properties
 var _dimmensions = ['width', 'height', 'x', 'y'];
-// a time to wait after mouseouts before deactivation 
+// a time to wait after mouseouts before deactivation
 var deactivationDelay = 500;
 // debouncing function / object to release load
 function debounce(fn, delay) {
@@ -148,7 +148,7 @@ function onHandleDrag() {
     pos = Math.min(this.data.barMaxScroll, Math.max(0, pos));
     var val = Math.round(pos / this.data.barMaxScroll * this.data.maxScroll);
     if (val !== this.data.scroll) {
-    	
+
         this.data.scroll = val;
         if (this.data.content) {
 	        _updateContentPosition.bind(this)();
@@ -233,7 +233,7 @@ function init() {
 
     // debounce to gain better performance
     this.onHandleDrag = debounce(onHandleDrag.bind(this), 100);
- 
+
    // provide visible API to owner
     OWNER_API_NAMES.forEach(function(prop) {
     	var p = this[prop];

@@ -676,6 +676,9 @@
         'checkbox' : {
             include        : ['base']
         },
+        'inlineFrame' : {
+            include        : ['base']
+        },
         'imageMapRegion' : {
             include        : ['base', 'tooltips'],
             names        : ['scrollToThis'],
