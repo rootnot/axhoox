@@ -75,6 +75,9 @@
     // defined few hunred lines down
     API_MAP,
 
+    // ScriptContext properties not set on prototype and reserved for runtime
+    SCRIPT_CONTEXT_RESERVED_RX,
+
     // prototype of basic scriptContext
     _defaultContext,
 
@@ -551,6 +554,8 @@
     ////////////////////////////////////////////////////////////////////////////////////
     // Constructor
     ////////////////////////////////////////////////////////////////////////////////////
+
+    SCRIPT_CONTEXT_RESERVED_RX = /path|scriptId|rdoIdx|ownerIdx|data|label|page|master/;
 
     function ScriptContext(path, scriptId, ownerIndex) {
 
@@ -1055,16 +1060,111 @@
     // enhancements of prototype elements
 
     // For masters
+
+    function _prepareNamespace(instance, namespaceName, options) {
+
+        var inss, ins, prop, pdesc;
+
+        if (!instance.hasOwnProperty('_nss')) {
+            Object.defineProperty(instance, '_nss', {
+                value : {},
+                configurable : false,
+                writable : false,
+                enumerable : false
+            });
+        }
+
+        inss = instance._nss;
+
+        if (options.prototype) {
+            ins = Object.create(options.prototype);
+        }
+
+        if ('expose' in options) {
+            if ('object' === typeof options.expose) {
+                ins = ins || {};
+                for (prop in options.expose) {
+                    if (options.expose.hasOwnProperty(prop)) {
+                        Object.defineProperty(ins, prop, Object.getOwnPropertyDescriptor(options.expose, prop));
+                    }
+                }
+            } else if (!ins){
+                ins = options.expose;
+            }
+        }
+
+        if ('bind' in options && (!ins || 'object' === typeof ins)) {
+            if ('object' === typeof options.bind) {
+                ins = ins || {};
+                for (prop in options.bind) {
+                    if (options.bind.hasOwnProperty(prop) && "function" === typeof options.bind[prop]) {
+                        pdesc = Object.getOwnPropertydescriptor(options.bind, prop);
+                        pdesc.value = pdesc.value.bind(instance);
+                        Object.defineProperty(ins, prop, pdesc);
+                    }
+                }
+            } else if (!ins && 'function' === typeof options.bind) {
+                ins = options.bind.bind(instance);
+            }
+        }
+
+        inss[namespaceName] = ins;
+
+    }
+
+
+    function _prepareExtender(masterContext) {
+        return {
+            extend : function extend(namespace, options) {
+                !SCRIPT_CONTEXT_RESERVED_RX.test(namespace) &&
+                !namespace in masterContext &&
+                Object.defineProperty(masterContext, namespace, {
+                   get : function() {
+                       if (this === masterContext) {
+                           return options;
+                       }
+                       if (!this._inss || !this._inss[namespace]) {
+                           _prepareNamespace(this, namespace, options);
+                       }
+                       return this._inss[namespace];
+                   },
+                   configurable : false,
+                   writable : false,
+                   enumerable : false
+                });
+                return _prepareExtender(masterContext);
+            },
+            defined : function defined(namespace, selector) {
+                var nsd = masterContext[namespace];
+                return selector ? nsd && nsd[selector] : nsd;
+            }
+        };
+    }
+
+
     function prepareMasterContext(masterName, context) {
+
+        var masterContext;
+
         Object.keys($axure.pageData.masters).some(function(mid) {
             var m = $axure.pageData.masters[mid];
-            if (m.name !== masterName) {
-                return false;
+
+            if ($axure.pageData.masters[mid].name === masterName) {
+                masterContext = m._axHooxMasterContext ||
+                                (m._axHooxMasterContext = Object.create(_getApiPrototype(MASTER_REF_TYPE)));
+                return true;
             }
-            m._axHooxMasterContext = Object.create(_getApiPrototype(MASTER_REF_TYPE));
-            $.extend(m._axHooxMasterContext, context);
-            return true;
+
+            return false;
         });
+
+        if ('object' === typeof context) {
+            // the old way
+            $.extend(m._axHooxMasterContext, context);
+        }
+
+        return _prepareExtender(masterContext);
+
     }
 
     // And for a page
