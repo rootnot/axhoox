@@ -1059,8 +1059,9 @@
     // Helpers allowing functional
     // enhancements of prototype elements
 
-    // For masters
+    // agnostic
 
+    // lazy evaluator of an abstract object's namespace extension
     function _prepareNamespace(instance, namespaceName, options) {
 
         var inss, ins, prop, pdesc;
@@ -1110,37 +1111,41 @@
 
         inss[namespaceName] = ins;
 
-    }
+        return ins;
 
+    }
 
     function _prepareExtender(masterContext) {
         return {
-            extend : function extend(namespace, options) {
+            defineNamespace : function defineNamespace(namespace, options) {
+                namespace && options &&
                 !SCRIPT_CONTEXT_RESERVED_RX.test(namespace) &&
                 !namespace in masterContext &&
                 Object.defineProperty(masterContext, namespace, {
                    get : function() {
+
                        if (this === masterContext) {
-                           return options;
+                           // return only expositions if not in instance scope
+                           return options.expose;
                        }
-                       if (!this._inss || !this._inss[namespace]) {
-                           _prepareNamespace(this, namespace, options);
-                       }
-                       return this._inss[namespace];
+                       // return instance's namespace instance, prepare upon first reference
+                       return this._inss && this._inss[namespace] || _prepareNamespace(this, namespace, options);
+
                    },
                    configurable : false,
                    writable : false,
                    enumerable : false
                 });
-                return _prepareExtender(masterContext);
+                return this;
             },
-            defined : function defined(namespace, selector) {
-                var nsd = masterContext[namespace];
-                return selector ? nsd && nsd[selector] : nsd;
+            definedExpositions : function definedExpositions(namespace) {
+                return masterContext[namespace];
             }
         };
     }
 
+
+    // For masters
 
     function prepareMasterContext(masterName, context) {
 
