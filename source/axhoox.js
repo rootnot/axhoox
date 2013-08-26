@@ -667,6 +667,9 @@
         'textArea' : {
             include        : ['base', 'text']
         },
+        'imageBox'    : {
+            include        : ['base']
+        },
         'listBox' : {
             include        : ['base']
         },
