@@ -1120,7 +1120,7 @@
             defineNamespace : function defineNamespace(namespace, options) {
                 namespace && options &&
                 !SCRIPT_CONTEXT_RESERVED_RX.test(namespace) &&
-                !namespace in masterContext &&
+                !(namespace in masterContext) &&
                 Object.defineProperty(masterContext, namespace, {
                    get : function() {
 
