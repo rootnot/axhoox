@@ -28,7 +28,7 @@ var API = {
     getTracks : getTracks,
     popTrack : popTrack,
     init : init
-}
+};
 
 masterContext && $.extend(masterContext, API) || prepareMasterContext(MASTER_DEFAULT_NAME, API);
 
