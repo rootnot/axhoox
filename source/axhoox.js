@@ -27,6 +27,7 @@
     // object types corresponding to Axure scheme
     MASTER_REF_TYPE = 'referenceDiagramObject', // master reference
     DYNAMIC_PANEL_TYPE = 'dynamicPanel', // dynamic panel reference
+    IMAGE_BOX_TYPE = 'imageBox', // image box type
     PAGE_TYPE = 'Axure:Page', // page
     BUTTON_SHAPE_TYPE = 'buttonShape',
     RICH_TEXT_PANEL_TYPE = 'richTextPanel',
@@ -668,7 +669,7 @@
             include        : ['base', 'text']
         },
         'imageBox'    : {
-            include        : ['base']
+            include        : ['axure-widget']
         },
         'listBox' : {
             include        : ['base']
@@ -944,7 +945,11 @@
                         // I suppose. I wish ;)
                         traverseDiagramObject(o.diagrams[j], newPath, ownerIdx);
                     }
-                } else if (o.type === BUTTON_SHAPE_TYPE || (o.type === RICH_TEXT_PANEL_TYPE && o.objects)) {
+                } else if (
+                        o.type === BUTTON_SHAPE_TYPE ||
+                        o.type === IMAGE_BOX_TYPE ||
+                        (o.type === RICH_TEXT_PANEL_TYPE && o.objects)
+                    ) {
                     traverseDiagramObject(o, newPath, ownerIdx);
                 }
             }
