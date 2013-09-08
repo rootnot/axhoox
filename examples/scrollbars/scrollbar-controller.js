@@ -173,7 +173,7 @@ function onHandleDrag() {
     pos = Math.min(this.data.barMaxScroll, Math.max(0, pos));
     var val = Math.round(pos / this.data.barMaxScroll * this.data.maxScroll);
     if (val !== this.data.scroll) {
-    	
+        
         this.data.scroll = val;
         if (this.data.content) {
             _updateContentPosition.bind(this)();
