@@ -236,22 +236,22 @@ function init() {
 
    // provide visible API to owner
     OWNER_API_NAMES.forEach(function(prop) {
-    	var p = this[prop];
-    	if (typeof(p) === 'function') {
-    		// a method
-    		bar[prop] = p.bind(this);
-    	} else {
-    		// a data property
-    		var _selfData = this.data;
-    		Object.defineProperty(bar.data, prop, {
-    			get : function() {
-    				return _selfData[prop];
-    			},
-    			set : function(v) {
-    				_selfData[prop] = v;
-    			}
-    		});
-    	}
+        var p = this[prop];
+        if (typeof(p) === 'function') {
+            // a method
+            bar[prop] = p.bind(this);
+        } else {
+            // a data property
+            var _selfData = this.data;
+            Object.defineProperty(bar.data, prop, {
+                get : function() {
+                    return _selfData[prop];
+                },
+                set : function(v) {
+                    _selfData[prop] = v;
+                }
+            });
+        }
     }, this);
 
     // enable control
