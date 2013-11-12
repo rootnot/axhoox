@@ -889,6 +889,7 @@
 
         // tiny tiny helper
         function traverseDiagramObject(diagramObject, path, ownerIdx) {
+            console.log('Traverse - start:', path, ownerIdx, diagramObject.type);
             walkDiagramObjects(diagramObject.objects, path, ownerIdx);
         }
 
@@ -910,7 +911,9 @@
 
         // main traversal, recursive
         function walkDiagramObjects(objects, path, ownerIdx) {
-            var o, mo, po, newPath, scriptId, i, li, j;
+            var 
+                o, mo, po, newPath, scriptId, i, li, j, lj, _ownerIdxTranslationStack = [], 
+                _oldOwnerIdx, _newOwnerIdx, pv, io;
             for (i = 0, li = objects.length; i < li; i++) {
                 o = objects[i];
                 if (o.isContained && o.type === RICH_TEXT_PANEL_TYPE && o.label.length === 0) {
@@ -921,6 +924,9 @@
                     warnNonLabeled(o, path);
                 }
                 newPath = path + '/' + o.label;
+                
+                console.log('New path:', newPath);
+                
                 if (o.type === MASTER_REF_TYPE) {
                     _rdoFnToPath.push(newPath);
                     traverseDiagramObject($axure.pageData.masters[o.masterId].diagram, newPath, _rdoFnToPath.length - 1);
@@ -928,6 +934,8 @@
                 } else {
                     scriptId = $axure.pageData.objectPathToScriptId[scriptIdx].scriptId;
                 }
+                
+                console.log(newPath, '::', scriptId);
 
                 if ( o.scriptIds.length > 1 ) {
                     _createAccessorsForScriptId(scriptId);
@@ -943,8 +951,37 @@
                         // traversing states from bottom to top
                         // to reflect real object placement in html
                         // I suppose. I wish ;)
+                        
+                        _newOwnerIdx = _rdoFnToPath.length;
+                        
                         traverseDiagramObject(o.diagrams[j], newPath, ownerIdx);
+                        
+                        _oldOwnerIdx = _newOwnerIdx;
+                        _newOwnerIdx = _rdoFnToPath.length;
+                        
+                        if (_oldOwnerIdx < _newOwnerIdx) {
+                            // new masters arrived inside
+                            _ownerIdxTranslationStack.push(
+                                {
+                                    o : _oldOwnerIdx,
+                                    n : _newOwnerIdx
+                                });
+                        }
                     }
+                    
+                    console.log(_ownerIdxTranslationStack.length);
+                    
+                    if (_ownerIdxTranslationStack.length > 0) {
+                        for (j = 0, lj = _ownerIdxTranslationStack.length; j < lj; j ++) {
+                            
+                            po = _ownerIdxTranslationStack[j];
+                            
+                            console.log(po.o, '::', po.n);
+                            
+                            
+                        }
+                    }
+                    
                 } else if (
                         o.type === BUTTON_SHAPE_TYPE ||
                         o.type === IMAGE_BOX_TYPE ||
