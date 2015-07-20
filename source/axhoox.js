@@ -1044,7 +1044,7 @@
     // occured
     function _handlerPrecheck(varname, value) {
             if (varname !== _triggeringVarName) {
-                $axure.globalVariableProvider._setVariableValue.apply($axure.globalVariableProvider, arguments);
+                _savedSetVariableValueHandler.apply($axure.globalVariableProvider, arguments);
             } else if (value === PACKAGE) {
                 console.warn(
                     "Probably you are using Google Chrome in local mode." +
