@@ -1245,7 +1245,7 @@
 
         // Check if any of the variables will bring that magic key to us
         if (!$axure.globalVariableProvider.getDefinedVariables().some(function(v) {
-            if ($axure.globalVariableProvider.getVariableValue(v) === PACKAGE) {
+            if (v === PACKAGE || $axure.globalVariableProvider.getVariableValue(v) === PACKAGE) {
                 _triggeringVarName = v;
                 return true;
             }
@@ -1267,6 +1267,9 @@
         var statusObjects = $axure(function(o) {
             return o.type === MASTER_REF_TYPE && $axure.pageData.masters[o.masterId].name === STATUS_MASTER;
         }).getIds();
+        
+        // reset the triggering variable for any circumstances
+        $axure.globalVariableProvider.setVariableValue(_triggeringVarName, PACKAGE);
 
         // Ready to handle warm up events
         _setHandler(_prepareMasterContextHandler, true);
