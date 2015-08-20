@@ -1239,6 +1239,11 @@
             return toApply;
         };
     }
+    
+    // utility for sorting Id's
+    function _sortIds(a, b) {
+        return Math.sign(parseInt(a.replace('u', '')) - parseInt(b.replace('u', '')));
+    }
 
     // Let's roll!
     function _init() {
@@ -1266,7 +1271,10 @@
         // List of status master's instances
         var statusObjects = $axure(function(o) {
             return o.type === MASTER_REF_TYPE && $axure.pageData.masters[o.masterId].name === STATUS_MASTER;
-        }).getIds();
+        })
+        .getIds()
+        // sort id's according to document ordering to avoid misconfigurations of dependencies
+        .sort(_sortIds);
         
         // reset the triggering variable for any circumstances
         $axure.globalVariableProvider.setVariableValue(_triggeringVarName, PACKAGE);
@@ -1290,7 +1298,11 @@
             return o.type === MASTER_REF_TYPE &&
                 $axure.pageData.masters[o.masterId]._axHooxMasterContext &&
                 $axure.pageData.masters[o.masterId]._axHooxMasterContext.autostart;
-        }).getIds().forEach(function(scriptId) {
+        })
+        .getIds()
+        // sort to allow dependencies to init first
+        .sort(_sortIds)
+        .forEach(function(scriptId) {
             _getContext(_scriptIdToPath[scriptId]);
         });
 
